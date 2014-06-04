@@ -5,6 +5,7 @@
 #include <QPair>
 #include <QVector>
 #include <QString>
+#include <QDebug>
 
 namespace GYS {
 /**
@@ -18,13 +19,18 @@ using SiteId		= QString;
 using SiteRank		= qint32;
 
 /**
+ * \brief Cell array
+ */
+using CellArray		= QVector< QString >;
+
+/**
  * \brief Type of site complete data
  */
-using SiteData		= QPair< QVector< QString >, GYS::SiteRank>;
-
-
-//static const SiteId SITE_
+using SiteData		= QPair< GYS::CellArray, GYS::SiteRank>;
 
 }
+
+#define TRACE_ENTRY do { qDebug() << "Entered: " << __func__; } while(0)
+
 
 #endif // GYSTYPES_H

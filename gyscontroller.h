@@ -5,7 +5,7 @@
 #include <QString>
 #include <QMap>
 
-#include <gystypes.h>
+#include "gystypes.h"
 
 namespace GYS {
 

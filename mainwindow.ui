@@ -33,7 +33,7 @@
        <enum>QLayout::SetMaximumSize</enum>
       </property>
       <item row="0" column="0">
-       <widget class="QTableWidget" name="tableWidget">
+       <widget class="QTableWidget" name="mainSitesTable">
         <column>
          <property name="text">
           <string>Client</string>
@@ -47,7 +47,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QTableWidget" name="tableWidget_2">
+       <widget class="QTableWidget" name="similarSitesTable">
         <column>
          <property name="text">
           <string>Similar site</string>
@@ -65,35 +65,35 @@
     <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="pushButton_5">
+       <widget class="QPushButton" name="btnLoadFile">
         <property name="text">
          <string>Load a file</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="btnUpdateSelected">
         <property name="text">
          <string>Update selected</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="btnUpdateAll">
         <property name="text">
          <string>Update all</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_4">
+       <widget class="QPushButton" name="btnFindSimilar">
         <property name="text">
          <string>Find similar</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="btnUpdateSimilar">
         <property name="text">
          <string>Update similar</string>
         </property>
