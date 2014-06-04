@@ -11,22 +11,22 @@ namespace GYS {
 /**
  * \brief Type of site ID, describing a unique site
  */
-using SiteId		= QString;
+using SiteId        = QString;
 
 /**
  * \brief Type of site rank
  */
-using SiteRank		= qint32;
+using SiteRank      = qint32;
 
 /**
  * \brief Cell array
  */
-using CellArray		= QVector< QString >;
+using CellArray     = QVector< QString >;
 
 /**
  * \brief Type of site complete data
  */
-using SiteData		= QPair< GYS::CellArray, GYS::SiteRank>;
+using SiteData      = QPair< GYS::CellArray, GYS::SiteRank>;
 
 }
 
