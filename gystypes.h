@@ -8,25 +8,57 @@
 #include <QDebug>
 
 namespace GYS {
-/**
- * \brief Type of site ID, describing a unique site
- */
-using SiteId        = QString;
 
 /**
- * \brief Type of site rank
+ * \brief Enum describing types of item that could exist
  */
-using SiteRank      = qint32;
+enum class ItemType {
+    /**
+     * Specifies that given item is a parent key for accociated data
+     */
+    PARENT_KEY,
+
+    /**
+     * Type to represent site name
+     */
+    NAME_ID,
+
+    /**
+     * Type to represent host country of the site
+     */
+    HOST_COUNTRY,
+
+    /**
+     * Type to represent world rank of the site
+     */
+    WORLD_RANK,
+
+    /**
+     * Region where given site has most visitors
+     */
+    REGION_ID,
+
+    /**
+     * Rank of the site in most popular region
+     */
+    REGION_RANK,
+};
 
 /**
- * \brief Cell array
+ * \brief Type to represent a single data item with specified type
  */
-using CellArray     = QVector< QString >;
+using DataItem_Pair  = QPair< GYS::ItemType, QString >;
 
 /**
- * \brief Type of site complete data
+ * \brief Type to represent a row of a data
  */
-using SiteData      = QPair< GYS::CellArray, GYS::SiteRank>;
+using DataRow_Vec    = QVector< GYS::DataItem_Pair >;
+
+/**
+ * \brief Type to represent a table with data, indexed by needed key
+ */
+using DataTable_Map  = QMap< GYS::DataItem_Pair, GYS::DataRow_Vec >;
+
 
 }
 

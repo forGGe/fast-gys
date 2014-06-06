@@ -33,66 +33,57 @@ void MainWindow::fileLoadingDone()
 
 }
 
-void MainWindow::recieveMainSitesdata(QMap< GYS::SiteId, GYS::SiteData > data)
+void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 {
     TRACE_ENTRY;
-
-    // Determine amount of rows right now
-    int rows            = data.size();
-    int row             = 0;
-    int col             = 0;
-    int oldcols         = 0;
-    int newcols         = 0;
-    // Item to put into table
-    QTableWidgetItem    *newItem;
+    int rows  = data.size();
+    int row   = 0;
+    QTableWidgetItem   *newItem  = NULL;
 
     ui->mainSitesTable->setRowCount(rows);
+    ui->mainSitesTable->setColumnCount(6);
     for (auto it = data.begin(); it != data.end(); ++it)
     {
-        // Extract needed data
-        const GYS::SiteId	 curId           = it.key();
-        const GYS::SiteData	 curData         = it.value();
-        const GYS::CellArray additionalCells = curData.first;
-        const GYS::SiteRank	 curRank         = curData.second;
+        GYS::DataItem_Pair siteName = it.key();
+        GYS::DataRow_Vec siteRow = it.value();
 
-        // Determine amount of columns right now
-        // In general, amount of columns should be
-        // enough to represent a table that contains
-        // id, rank and all additional cells that may exist
-        newcols = additionalCells.size() + 8;
-        if (newcols > oldcols)
+        newItem = new QTableWidgetItem(siteName.second);
+        ui->mainSitesTable->setItem(row, 0, newItem);
+
+        for (auto it2 = siteRow.begin(); it2 != siteRow.end(); ++it2)
         {
-            ui->mainSitesTable->setColumnCount(newcols);
-            oldcols = newcols;
+            GYS::DataItem_Pair cell = *it2;
+            int col = 0;
+            switch(cell.first)
+            {
+            case GYS::ItemType::HOST_COUNTRY:
+                col = 1;
+                break;
+            case GYS::ItemType::REGION_ID:
+                col = 2;
+                break;
+            case GYS::ItemType::REGION_RANK:
+                col = 3;
+                break;
+            case GYS::ItemType::WORLD_RANK:
+                col = 4;
+                break;
+            case GYS::ItemType::NAME_ID:
+            case GYS::ItemType::PARENT_KEY:
+            default:
+                qDebug() << "Spurious action!";
+                break;
+            }
+
+            if (col)
+                newItem = new QTableWidgetItem(cell.second);
+
+            ui->mainSitesTable->setItem(row, col, newItem);
         }
-
-        col = 0;
-        newItem = new QTableWidgetItem(curId);
-        ui->mainSitesTable->setItem(row, col++, newItem);
-        newItem = new QTableWidgetItem(QString::number(curRank));
-        ui->mainSitesTable->setItem(row, col++, newItem);
-
-        for (auto it2 = additionalCells.begin(); it2 != additionalCells.end(); ++it2)
-        {
-            newItem = new QTableWidgetItem(*it2);
-            ui->mainSitesTable->setItem(row, col++, newItem);
-        }
-
         row++;
     }
 }
 
-void MainWindow::recieveMainSitesRank(QMap< GYS::SiteId, GYS::SiteRank > ranks)
-{
-    TRACE_ENTRY;
-
-}
-
-void MainWindow::recieveSimilarSites(GYS::SiteId mainSite, QList< GYS::SiteData > similarSites)
-{
-    TRACE_ENTRY;
-
-}
 
 void MainWindow::on_btnLoadFile_clicked()
 {

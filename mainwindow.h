@@ -3,7 +3,8 @@
 
 #include <QMainWindow>
 
-#include <gyscontroller.h>
+#include "gyscontroller.h"
+#include "gystypes.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,17 +31,15 @@ signals:
     void launching();
     void exiting();
     void requestLoadFile(QString file_name);
-    void requestUpdateRating(QList< GYS::SiteId > sites);
+    void requestUpdateRating(QList< QString > sites);
     void requestUpdateAll();
-    void requestFindSimilar(QList< GYS::SiteId > sites);
-    void requestUpdateSimilar(QList< GYS::SiteId > sites);
+    void requestFindSimilar(QList< QString > sites);
+    void requestUpdateSimilar(QList< QString > sites);
 
 public slots:
     void lauchDone();
     void fileLoadingDone();
-    void recieveMainSitesdata(QMap< GYS::SiteId, GYS::SiteData > data);
-    void recieveMainSitesRank(QMap< GYS::SiteId, GYS::SiteRank > ranks);
-    void recieveSimilarSites(GYS::SiteId mainSite, QList< GYS::SiteData > similarSites);
+    void recieveSitesData(GYS::DataTable_Map data);
 };
 
 #endif // MAINWINDOW_H

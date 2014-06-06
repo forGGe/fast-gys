@@ -51,23 +51,7 @@ signals:
      *
      * \param[in] data Contains site data associated with site id's.
      */
-    void sendMainSitesData(QMap< GYS::SiteId, GYS::SiteData > data);
-
-    /**
-     * \brief Emits to send ranks of main sites
-     *
-     * \param[in] ranks Contains ranks for listed sites.
-     */
-    void sendMainSitesRank(QMap< GYS::SiteId, GYS::SiteRank > ranks);
-
-
-    /**
-     * \brief Emits to send similar sites (and their data) of main site
-     *
-     * \param[in] mainSite      Site which simiraties should be found
-     * \param[in] similarSites  Contains all similar sites and their data
-     */
-    void sendSimilarSites(GYS::SiteId mainSite, QList< GYS::SiteData > similarSites);
+    void sendSitesData(GYS::DataTable_Map data);
 
 public slots:
     /**
@@ -89,7 +73,7 @@ public slots:
     /**
      * \brief Updates rating of a given site names
      */
-    void updateRating(QList< GYS::SiteId > sites);
+    void updateRating(QList< QString > sites);
 
     /**
      * \brief Updates all records and finds ranks for it
@@ -101,14 +85,14 @@ public slots:
      *
      * It will load information from cache, if such exist.
      */
-    void findSimilar(QList< GYS::SiteId > sites);
+    void findSimilar(QList< QString > sites);
 
     /**
      * \brief Updates similar sites for given sites
      *
      * It will update cache with newest information.
      */
-    void updateSimilar(QList< GYS::SiteId > sites);
+    void updateSimilar(QList< QString > sites);
 
     /**
      * }@

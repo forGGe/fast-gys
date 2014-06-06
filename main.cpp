@@ -31,12 +31,8 @@ int main(int argc, char *argv[])
                      &w, &MainWindow::lauchDone);
     QObject::connect(&ctrl, &GYS::Controller::fileLoaded,
                      &w, &MainWindow::fileLoadingDone);
-    QObject::connect(&ctrl, &GYS::Controller::sendMainSitesData,
-                     &w, &MainWindow::recieveMainSitesdata);
-    QObject::connect(&ctrl, &GYS::Controller::sendMainSitesRank,
-                     &w, &MainWindow::recieveMainSitesRank);
-    QObject::connect(&ctrl, &GYS::Controller::sendSimilarSites,
-                     &w, &MainWindow::recieveSimilarSites);
+    QObject::connect(&ctrl, &GYS::Controller::sendSitesData,
+                     &w, &MainWindow::recieveSitesData);
 
     w.show();
 

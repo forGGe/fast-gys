@@ -31,7 +31,7 @@ void GYS::Controller::loadFile(QString file_name)
 	emit fileLoaded();
 }
 
-void GYS::Controller::updateRating(QList< GYS::SiteId > sites)
+void GYS::Controller::updateRating(QList< QString > sites)
 {
 	TRACE_ENTRY;
 
@@ -40,32 +40,35 @@ void GYS::Controller::updateRating(QList< GYS::SiteId > sites)
 void GYS::Controller::updateAll()
 {
 	TRACE_ENTRY;
-	GYS::SiteRank sr1 = 10;
-	GYS::SiteRank sr2 = 105;
 
-	GYS::SiteId sid1 = "OLOLOL.com";
-	GYS::SiteId sid2 = "OLOLOL2.com";
+    GYS::DataRow_Vec site1_row =
+    {
+        { GYS::ItemType::REGION_ID, "US" },
+        { GYS::ItemType::REGION_RANK, "10" },
+    };
 
-	GYS::CellArray sdata1_str = { "BLAH", "BLAH2", "Some cell" };
-	GYS::CellArray sdata2_str = { "SPARTAAA", "some sign", "Some again" };
+    GYS::DataRow_Vec site2_row =
+    {
+        { GYS::ItemType::REGION_ID, "RU" },
+        { GYS::ItemType::REGION_RANK, "210" },
+    };
 
-	GYS::SiteData sdata1(sdata1_str, sr1);
-	GYS::SiteData sdata2(sdata2_str, sr2);
+    GYS::DataTable_Map data =
+    {
+        { { GYS::ItemType::NAME_ID, "ololoshka.com" }, site2_row },
+        { { GYS::ItemType::NAME_ID, "facetable.com" }, site1_row },
+    };
 
-	QMap< GYS::SiteId, GYS::SiteData > data;
-	data.insert(sid1, sdata1);
-	data.insert(sid2, sdata2);
-
-	emit sendMainSitesData(data);
+    emit sendSitesData(data);
 }
 
-void GYS::Controller::findSimilar(QList< GYS::SiteId > sites)
+void GYS::Controller::findSimilar(QList< QString > sites)
 {
 	TRACE_ENTRY;
 
 }
 
-void GYS::Controller::updateSimilar(QList< GYS::SiteId > sites)
+void GYS::Controller::updateSimilar(QList< QString > sites)
 {
 	TRACE_ENTRY;
 
