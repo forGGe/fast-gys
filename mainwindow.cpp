@@ -1,3 +1,5 @@
+#include <QFileDialog>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -36,9 +38,9 @@ void MainWindow::fileLoadingDone()
 void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 {
     TRACE_ENTRY;
-    int rows  = data.size();
-    int row   = 0;
-    QTableWidgetItem   *newItem  = NULL;
+    int rows = data.size();
+    int row  = 0;
+    QTableWidgetItem *newItem = NULL;
 
     ui->mainSitesTable->setRowCount(rows);
     ui->mainSitesTable->setColumnCount(6);
@@ -56,10 +58,10 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
             int col = 0;
             switch(cell.first)
             {
-            case GYS::ItemType::HOST_COUNTRY:
+            case GYS::ItemType::NUM_ID:
                 col = 1;
                 break;
-            case GYS::ItemType::REGION_ID:
+            case GYS::ItemType::DATE_ADDED:
                 col = 2;
                 break;
             case GYS::ItemType::REGION_RANK:
@@ -88,7 +90,12 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 void MainWindow::on_btnLoadFile_clicked()
 {
     TRACE_ENTRY;
-    emit requestLoadFile(QString("test_file.csv"));
+    QString filePath = QFileDialog::getOpenFileName(this,
+                                                    "Open CSV",
+                                                    ".",
+                                                    "Comma separated value (*.csv)");
+
+    emit requestLoadFile(filePath);
 }
 
 void MainWindow::on_btnUpdateAll_clicked()

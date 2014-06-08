@@ -9,6 +9,12 @@
 
 namespace GYS {
 
+// TODO: make it familiar with next stuff:
+// "Client ID" "Login" "Added" "Inviter" "Manager (Publishers)"
+// "Manager (Products)" "Manager (News)" "Manager (Audience Development)"
+// "Manager (Banners)" "Status" "MG-Wallet" "Current balance" "Totally spent"
+// "Totally paid" "Last replenishment date"
+
 /**
  * \brief Enum describing types of item that could exist
  */
@@ -19,9 +25,19 @@ enum class ItemType {
     PARENT_KEY,
 
     /**
-     * Type to represent site name
+     * Type to represent client id, numerical form
+     */
+    NUM_ID,
+
+    /**
+     * Type to represent client id, string form (site name actually)
      */
     NAME_ID,
+
+    /**
+     * Type to represent date when site was added
+     */
+    DATE_ADDED,
 
     /**
      * Type to represent host country of the site

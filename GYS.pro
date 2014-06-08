@@ -15,10 +15,12 @@ CONFIG += c++11
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    gyscontroller.cpp
+    gys_controller.cpp \
+    gys_csvfetcher.cpp
 
 HEADERS  += mainwindow.h \
-    gyscontroller.h \
-    gystypes.h
+    gys_controller.h \
+    gys_types.h \
+    gys_csvfetcher.h
 
 FORMS    += mainwindow.ui

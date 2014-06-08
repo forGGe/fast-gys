@@ -1,5 +1,7 @@
 #include <QtDebug>
-#include "gyscontroller.h"
+
+#include "gys_controller.h"
+#include "gys_csvfetcher.h"
 
 GYS::Controller::Controller(QObject *parent) :
 	QObject(parent)
@@ -25,10 +27,15 @@ void GYS::Controller::exit()
 
 }
 
-void GYS::Controller::loadFile(QString file_name)
+void GYS::Controller::loadFile(QString filePath)
 {
 	TRACE_ENTRY;
+    GYS::CSVFetcher fetcher;
+    GYS::DataTable_Map table;
+    fetcher.setFile(filePath);
+    table = fetcher.getData(100);
 	emit fileLoaded();
+    emit sendSitesData(table);
 }
 
 void GYS::Controller::updateRating(QList< QString > sites)

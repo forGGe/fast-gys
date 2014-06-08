@@ -3,8 +3,8 @@
 
 #include <QMainWindow>
 
-#include "gyscontroller.h"
-#include "gystypes.h"
+#include "gys_controller.h"
+#include "gys_types.h"
 
 namespace Ui {
 class MainWindow;

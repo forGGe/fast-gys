@@ -1,7 +1,7 @@
 #include <QApplication>
 
 #include "mainwindow.h"
-#include "gyscontroller.h"
+#include "gys_controller.h"
 
 int main(int argc, char *argv[])
 {

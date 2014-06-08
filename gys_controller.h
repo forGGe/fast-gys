@@ -5,7 +5,7 @@
 #include <QString>
 #include <QMap>
 
-#include "gystypes.h"
+#include "gys_types.h"
 
 namespace GYS {
 
@@ -68,7 +68,7 @@ public slots:
     /**
      * \brief Loads a file with a given filename
      */
-    void loadFile(QString file_name);
+    void loadFile(QString filePath);
 
     /**
      * \brief Updates rating of a given site names
