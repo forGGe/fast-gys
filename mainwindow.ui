@@ -36,12 +36,32 @@
        <widget class="QTableWidget" name="mainSitesTable">
         <column>
          <property name="text">
-          <string>Client</string>
+          <string>Client ID</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Alexa</string>
+          <string>Client name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Date added</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Alexa world rank</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Alexa top region</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Alexa region rank</string>
          </property>
         </column>
        </widget>

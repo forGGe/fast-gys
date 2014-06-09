@@ -32,10 +32,15 @@ void GYS::Controller::loadFile(QString filePath)
 	TRACE_ENTRY;
     GYS::CSVFetcher fetcher;
     GYS::DataTable_Map table;
+    // TODO: check and handle errors
     fetcher.setFile(filePath);
-    table = fetcher.getData(100);
 	emit fileLoaded();
-    emit sendSitesData(table);
+    do
+    {
+        table = fetcher.getData(128);
+        emit sendSitesData(table);
+        emit sendSitesData(table);
+    } while (!table.empty());
 }
 
 void GYS::Controller::updateRating(QList< QString > sites)
@@ -48,6 +53,8 @@ void GYS::Controller::updateAll()
 {
 	TRACE_ENTRY;
 
+    // TODO: next code is used as an example
+    // should be removed
     GYS::DataRow_Vec site1_row =
     {
         { GYS::ItemType::REGION_ID, "US" },

@@ -50,6 +50,13 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
         GYS::DataRow_Vec siteRow = it.value();
 
         newItem = new QTableWidgetItem(siteName.second);
+        // Find if such item already exist
+        int dubRow = ui->mainSitesTable->row(newItem);
+        if (dubRow >= 0)
+        {
+            qDebug() << "Item found";
+        }
+
         ui->mainSitesTable->setItem(row, 0, newItem);
 
         for (auto it2 = siteRow.begin(); it2 != siteRow.end(); ++it2)
