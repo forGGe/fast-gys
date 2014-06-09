@@ -4,54 +4,61 @@
 #include "gys_csvfetcher.h"
 
 GYS::Controller::Controller(QObject *parent) :
-	QObject(parent)
+    QObject(parent)
 {
-	TRACE_ENTRY;
+    TRACE_ENTRY;
 }
 
 GYS::Controller::~Controller()
 {
-	TRACE_ENTRY;
+    TRACE_ENTRY;
 
 }
 
 void GYS::Controller::launch()
 {
-	TRACE_ENTRY;
-	emit launched();
+    TRACE_ENTRY;
+    emit launched();
 }
 
 void GYS::Controller::exit()
 {
-	TRACE_ENTRY;
+    TRACE_ENTRY;
 
 }
 
 void GYS::Controller::loadFile(QString filePath)
 {
-	TRACE_ENTRY;
+    TRACE_ENTRY;
     GYS::CSVFetcher fetcher;
     GYS::DataTable_Map table;
     // TODO: check and handle errors
     fetcher.setFile(filePath);
-	emit fileLoaded();
-    do
+    emit fileLoaded();
+    quint32 rows = fetcher.getRowsCount();
+//    do
+//    {
+//        i++;
+//        table = fetcher.getData(128);
+//        emit sendSitesData(table);
+//    } while (!table.empty());
+    quint32 iters = rows / 128 + 1;
+    for (quint32 i = 0; i < iters; i++)
     {
         table = fetcher.getData(128);
         emit sendSitesData(table);
-        emit sendSitesData(table);
-    } while (!table.empty());
+    }
 }
 
 void GYS::Controller::updateRating(QList< QString > sites)
 {
-	TRACE_ENTRY;
+    TRACE_ENTRY;
 
 }
 
 void GYS::Controller::updateAll()
 {
-	TRACE_ENTRY;
+    TRACE_ENTRY;
 
     // TODO: next code is used as an example
     // should be removed
@@ -78,12 +85,12 @@ void GYS::Controller::updateAll()
 
 void GYS::Controller::findSimilar(QList< QString > sites)
 {
-	TRACE_ENTRY;
+    TRACE_ENTRY;
 
 }
 
 void GYS::Controller::updateSimilar(QList< QString > sites)
 {
-	TRACE_ENTRY;
+    TRACE_ENTRY;
 
 }

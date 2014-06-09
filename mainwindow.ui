@@ -36,12 +36,12 @@
        <widget class="QTableWidget" name="mainSitesTable">
         <column>
          <property name="text">
-          <string>Client ID</string>
+          <string>Client name</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Client name</string>
+          <string>Client ID</string>
          </property>
         </column>
         <column>
@@ -155,7 +155,7 @@
      <x>0</x>
      <y>0</y>
      <width>1183</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGrow_Your_Sales">

@@ -38,11 +38,14 @@ void MainWindow::fileLoadingDone()
 void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 {
     TRACE_ENTRY;
-    int rows = data.size();
-    int row  = 0;
+    int gotRows = data.size();
+    int targetRow;
     QTableWidgetItem *newItem = NULL;
 
-    ui->mainSitesTable->setRowCount(rows);
+    // Preallocate maximum expected amount of rows
+    // decrese it after if needed
+    // TODO: error check
+    ui->mainSitesTable->setRowCount(gotRows + ui->mainSitesTable->rowCount());
     ui->mainSitesTable->setColumnCount(6);
     for (auto it = data.begin(); it != data.end(); ++it)
     {
@@ -51,13 +54,14 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 
         newItem = new QTableWidgetItem(siteName.second);
         // Find if such item already exist
-        int dubRow = ui->mainSitesTable->row(newItem);
-        if (dubRow >= 0)
-        {
-            qDebug() << "Item found";
-        }
+        // TODO: use list containing particular name and its row,
+        // to quickly find a dublicates
+        for (targetRow = 0; targetRow < ui->mainSitesTable->rowCount(); ++targetRow)
+            if (ui->mainSitesTable->item(targetRow, 0) == nullptr ||
+                    (ui->mainSitesTable->item(targetRow, 0)->text() == siteName.second))
+                break;
 
-        ui->mainSitesTable->setItem(row, 0, newItem);
+        ui->mainSitesTable->setItem(targetRow, 0, newItem);
 
         for (auto it2 = siteRow.begin(); it2 != siteRow.end(); ++it2)
         {
@@ -87,9 +91,8 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
             if (col)
                 newItem = new QTableWidgetItem(cell.second);
 
-            ui->mainSitesTable->setItem(row, col, newItem);
+            ui->mainSitesTable->setItem(targetRow, col, newItem);
         }
-        row++;
     }
 }
 

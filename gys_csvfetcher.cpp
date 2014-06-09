@@ -4,6 +4,7 @@
 
 GYS::CSVFetcher::CSVFetcher()
     :m_csvFile()
+    ,m_in()
     ,m_rowCount(0)
     ,m_rowNext(0)
 {
@@ -32,20 +33,27 @@ bool GYS::CSVFetcher::setFile(const QString &filePath)
     }
 
     // Figure out how may rows are present
-    QTextStream in(&m_csvFile);
+    m_in.setDevice(&m_csvFile);
     // TODO: add check for file reading errors, trow exception
-    while(!in.atEnd())
+    while(!m_in.atEnd())
     {
         // TODO: add check for maximum line length,
         // error code should be enough here (file format is wrong)
-        tmp = in.readLine();
+        tmp = m_in.readLine();
         rows++;
     }
 
     m_rowNext = 0;
     m_rowCount = rows;
 
-    return m_csvFile.seek(0);
+    // TODO: close file here
+    // it should be opened again when reading will be needed
+    QString header;
+    m_in.seek(0);
+    header = m_in.readLine();
+    qDebug() << "header: " << header;
+
+    return true;
 }
 
 quint32 GYS::CSVFetcher::getRowsCount() const
@@ -62,26 +70,27 @@ quint32 GYS::CSVFetcher::getNextRowIdx() const
 
 GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 {
-    QTextStream         in(&m_csvFile);
-    QString             header;
     QString             line;
     QStringList         list;
     QRegExp             regx("\\t");
     GYS::DataTable_Map  table;
 
+    // TODO: Error check!
+
     regx.setCaseSensitivity(Qt::CaseInsensitive);
     regx.setPatternSyntax(QRegExp::RegExp2);
 
-    header = in.readLine();
-
-
-    while (!in.atEnd() && rowsAmount--)
+    while (!m_in.atEnd() && rowsAmount--)
     {
-        line = in.readLine();
-        line.remove(QRegExp("\""));
+        line = m_in.readLine();
+        line.remove('\"');
         list = line.split(regx);
 
-        // TODO
+        // HACK!!!!
+        if (list.size() < 3)
+            break;
+
+        // TODO: check for valid string!!!
         // avoid empty and pamela entries
         if (!list.at(1).isEmpty() && !(list.at(1) == "pamela"))
         {
@@ -92,8 +101,9 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
             GYS::DataRow_Vec rowData = { clientID, dateAdded };
 
             table.insert(clientName, rowData);
-
         }
+
+        m_rowNext++;
     }
     // Format:
     // "Client ID" -->"Login"<-- "Added" "Inviter" "Manager (Publishers)"

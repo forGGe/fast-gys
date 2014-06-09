@@ -79,9 +79,10 @@ public:
     GYS::DataRow_Vec findData(const QString& siteID) const;
 
 private:
-    QFile   m_csvFile;    /**< Target file */
-    quint32 m_rowCount;   /**< Amount of rows inside a file */
-    quint32 m_rowNext;    /**< Next row for reading */
+    QFile       m_csvFile;    /**< Target file */
+    QTextStream m_in;        /**< Stream for reading */
+    quint32     m_rowCount;   /**< Amount of rows inside a file */
+    quint32     m_rowNext;    /**< Next row for reading */
 };
 
 }
