@@ -75,10 +75,14 @@ using DataRow_Vec    = QVector< GYS::DataItem_Pair >;
  */
 using DataTable_Map  = QMap< GYS::DataItem_Pair, GYS::DataRow_Vec >;
 
-
 }
 
 #define TRACE_ENTRY do { qDebug() << "Entered: " << __func__; } while(0)
+
+// Declarations to make possible use new types in queued connections
+Q_DECLARE_METATYPE(GYS::DataItem_Pair)
+Q_DECLARE_METATYPE(GYS::DataRow_Vec)
+Q_DECLARE_METATYPE(GYS::DataTable_Map)
 
 
 #endif // GYSTYPES_H

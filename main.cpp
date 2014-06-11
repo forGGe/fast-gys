@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QThread>
 
 #include "mainwindow.h"
 #include "gys_controller.h"
@@ -8,7 +9,15 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MainWindow w;
-    GYS::Controller ctrl(&w);
+    GYS::Controller ctrl;
+    QThread modelThread;
+
+    // Registering meta types to make possible use new types in queued connections
+    qRegisterMetaType< GYS::DataItem_Pair >();
+    qRegisterMetaType< GYS::DataRow_Vec >();
+    qRegisterMetaType< GYS::DataTable_Map >();
+
+    ctrl.moveToThread(&modelThread);
 
     // Setup connections UI -> Controller
     QObject::connect(&w, &MainWindow::launching,
@@ -35,6 +44,7 @@ int main(int argc, char *argv[])
                      &w, &MainWindow::recieveSitesData);
 
     w.show();
+    modelThread.start();
 
     return a.exec();
 }
