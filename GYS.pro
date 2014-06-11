@@ -21,6 +21,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     gys_controller.h \
     gys_types.h \
-    gys_csvfetcher.h
+    gys_csvfetcher.h \
+    gys_exceptions.h
 
 FORMS    += mainwindow.ui

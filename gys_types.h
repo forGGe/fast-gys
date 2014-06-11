@@ -18,7 +18,8 @@ namespace GYS {
 /**
  * \brief Enum describing types of item that could exist
  */
-enum class ItemType {
+enum class ItemType
+{
     /**
      * Specifies that given item is a parent key for accociated data
      */
@@ -77,7 +78,7 @@ using DataTable_Map  = QMap< GYS::DataItem_Pair, GYS::DataRow_Vec >;
 
 }
 
-#define TRACE_ENTRY do { qDebug() << "Entered: " << __func__; } while(0)
+#define LOG_ENTRY do { qDebug() << "Entered: " << __func__; } while(0)
 
 // Declarations to make possible use new types in queued connections
 Q_DECLARE_METATYPE(GYS::DataItem_Pair)

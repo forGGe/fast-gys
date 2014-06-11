@@ -3,45 +3,40 @@
 #include "gys_controller.h"
 #include "gys_csvfetcher.h"
 
-GYS::Controller::Controller(QObject *parent) :
-    QObject(parent)
+GYS::Controller::Controller(QObject *parent) noexcept
+    :QObject(parent)
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
 }
 
 GYS::Controller::~Controller()
 {
-    TRACE_ENTRY;
-
+    LOG_ENTRY;
 }
 
-void GYS::Controller::launch()
+void GYS::Controller::launch() noexcept
 {
-    TRACE_ENTRY;
-    emit launched();
+    LOG_ENTRY;
+    emit sendError("Lauch preparation not implemented");
 }
 
-void GYS::Controller::exit()
+void GYS::Controller::exit() noexcept
 {
-    TRACE_ENTRY;
-
+    LOG_ENTRY;
+    emit sendError("Exit preparation not implemented");
 }
 
-void GYS::Controller::loadFile(QString filePath)
+void GYS::Controller::loadFile(QString filePath) noexcept
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
     GYS::CSVFetcher fetcher;
     GYS::DataTable_Map table;
     // TODO: check and handle errors
     fetcher.setFile(filePath);
     emit fileLoaded();
     quint32 rows = fetcher.getRowsCount();
-//    do
-//    {
-//        i++;
-//        table = fetcher.getData(128);
-//        emit sendSitesData(table);
-//    } while (!table.empty());
+
+
     quint32 iters = rows / 128 + 1;
     for (quint32 i = 0; i < iters; i++)
     {
@@ -50,16 +45,17 @@ void GYS::Controller::loadFile(QString filePath)
     }
 }
 
-void GYS::Controller::updateRating(QList< QString > sites)
+void GYS::Controller::updateRating(QList< QString > sites) noexcept
 {
-    TRACE_ENTRY;
-
+    LOG_ENTRY;
+    emit sendError("Updating not implemented");
 }
 
-void GYS::Controller::updateAll()
+void GYS::Controller::updateAll() noexcept
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
 
+#if 0
     // TODO: next code is used as an example
     // should be removed
     GYS::DataRow_Vec site1_row =
@@ -81,16 +77,19 @@ void GYS::Controller::updateAll()
     };
 
     emit sendSitesData(data);
+#endif
+    emit sendError("Updating not implemented");
 }
 
-void GYS::Controller::findSimilar(QList< QString > sites)
+void GYS::Controller::findSimilar(QList< QString > sites) noexcept
 {
-    TRACE_ENTRY;
-
+    LOG_ENTRY;
+    emit sendError("Finding not implemented");
 }
 
-void GYS::Controller::updateSimilar(QList< QString > sites)
+void GYS::Controller::updateSimilar(QList< QString > sites) noexcept
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
+    emit sendError("Updating not implemented");
 
 }

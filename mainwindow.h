@@ -40,6 +40,7 @@ public slots:
     void lauchDone();
     void fileLoadingDone();
     void recieveSitesData(GYS::DataTable_Map data);
+    void errorSlot(QString descr);
 };
 
 #endif // MAINWINDOW_H

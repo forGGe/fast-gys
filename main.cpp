@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
                      &w, &MainWindow::fileLoadingDone);
     QObject::connect(&ctrl, &GYS::Controller::sendSitesData,
                      &w, &MainWindow::recieveSitesData);
+    QObject::connect(&ctrl, &GYS::Controller::sendError,
+                     &w, &MainWindow::errorSlot);
 
     w.show();
     modelThread.start();

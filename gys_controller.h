@@ -22,7 +22,7 @@ public:
     /**
      * \brief The constructor
      */
-    explicit Controller(QObject *parent = 0);
+    explicit Controller(QObject *parent = 0) noexcept;
 
     /**
      * \brief The destructor
@@ -53,46 +53,53 @@ signals:
      */
     void sendSitesData(GYS::DataTable_Map data);
 
+    /**
+     * \brief Sends error
+     *
+     * \param[in] descr Description of an error
+     */
+    void sendError(QString descr);
+
 public slots:
     /**
      * \brief Notify about program to launch
      *
      */
-    void launch();
+    void launch() noexcept;
 
     /**
      * \brief Notify about program to exit
      */
-    void exit();
+    void exit() noexcept;
 
     /**
      * \brief Loads a file with a given filename
      */
-    void loadFile(QString filePath);
+    void loadFile(QString filePath) noexcept;
 
     /**
      * \brief Updates rating of a given site names
      */
-    void updateRating(QList< QString > sites);
+    void updateRating(QList< QString > sites) noexcept;
 
     /**
      * \brief Updates all records and finds ranks for it
      */
-    void updateAll();
+    void updateAll() noexcept;
 
     /**
      * \brief Founds similar sites for given sites
      *
      * It will load information from cache, if such exist.
      */
-    void findSimilar(QList< QString > sites);
+    void findSimilar(QList< QString > sites) noexcept;
 
     /**
      * \brief Updates similar sites for given sites
      *
      * It will update cache with newest information.
      */
-    void updateSimilar(QList< QString > sites);
+    void updateSimilar(QList< QString > sites) noexcept;
 
     /**
      * }@

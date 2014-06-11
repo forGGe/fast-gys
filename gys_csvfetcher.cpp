@@ -1,4 +1,4 @@
-
+#include "gys_exceptions.h"
 #include "gys_csvfetcher.h"
 
 
@@ -12,11 +12,14 @@ GYS::CSVFetcher::CSVFetcher()
 
 GYS::CSVFetcher::~CSVFetcher()
 {
+    LOG_ENTRY;
     // TODO: close file here
+    throw GYS::NotImplemented(Q_FUNC_INFO);
 }
 
 bool GYS::CSVFetcher::setFile(const QString &filePath)
 {
+    LOG_ENTRY;
     // TODO: close previous file here (if such exist)
     // handle I\O errors, trow exception
     bool    flag = true;
@@ -58,6 +61,7 @@ bool GYS::CSVFetcher::setFile(const QString &filePath)
 
 quint32 GYS::CSVFetcher::getRowsCount() const
 {
+    LOG_ENTRY;
     // TODO: check if file was really opened before
     return m_rowCount;
 }
@@ -65,11 +69,14 @@ quint32 GYS::CSVFetcher::getRowsCount() const
 
 quint32 GYS::CSVFetcher::getNextRowIdx() const
 {
+    LOG_ENTRY;
     return m_rowNext;
 }
 
 GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 {
+    LOG_ENTRY;
+
     QString             line;
     QStringList         list;
     QRegExp             regx("\\t");
@@ -115,12 +122,18 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 
 GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 startRow, quint32 endRow) const
 {
+    LOG_ENTRY;
+
+    throw GYS::NotImplemented(Q_FUNC_INFO);
     // TODO
 }
 
 
 GYS::DataRow_Vec GYS::CSVFetcher::findData(const QString& siteID) const
 {
+    LOG_ENTRY;
+
+    throw GYS::NotImplemented(Q_FUNC_INFO);
     // TODO
 }
 

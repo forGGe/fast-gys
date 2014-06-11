@@ -1,4 +1,5 @@
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -7,37 +8,37 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
     ui->setupUi(this);
 }
 
 MainWindow::~MainWindow()
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
     delete ui;
 }
 
 void MainWindow::on_btnExit_clicked()
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
     exit(0);
 }
 
 void MainWindow::lauchDone()
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
 
 }
 
 void MainWindow::fileLoadingDone()
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
 
 }
 
 void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
     int gotRows = data.size();
     int targetRow;
     QTableWidgetItem *newItem = NULL;
@@ -97,9 +98,18 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 }
 
 
+void MainWindow::errorSlot(QString descr)
+{
+    // TODO: Message box
+    QMessageBox msgBox;
+    msgBox.setText(descr);
+    msgBox.exec();
+}
+
+
 void MainWindow::on_btnLoadFile_clicked()
 {
-    TRACE_ENTRY;
+    LOG_ENTRY;
     QString filePath = QFileDialog::getOpenFileName(this,
                                                     "Open CSV",
                                                     ".",
