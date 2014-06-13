@@ -41,12 +41,14 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
     LOG_ENTRY;
     int gotRows = data.size();
     int targetRow;
+    int filledRowCount;
     QTableWidgetItem *newItem = NULL;
 
     // Preallocate maximum expected amount of rows
     // decrese it after if needed
     // TODO: error check
-    ui->mainSitesTable->setRowCount(gotRows + ui->mainSitesTable->rowCount());
+    filledRowCount = ui->mainSitesTable->rowCount();
+    ui->mainSitesTable->setRowCount(gotRows + filledRowCount);
     ui->mainSitesTable->setColumnCount(6);
     for (auto it = data.begin(); it != data.end(); ++it)
     {
@@ -57,10 +59,15 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
         // Find if such item already exist
         // TODO: use list containing particular name and its row,
         // to quickly find a dublicates
-        for (targetRow = 0; targetRow < ui->mainSitesTable->rowCount(); ++targetRow)
+        for (targetRow = 0; targetRow < filledRowCount; ++targetRow)
             if (ui->mainSitesTable->item(targetRow, 0) == nullptr ||
                     (ui->mainSitesTable->item(targetRow, 0)->text() == siteName.second))
+            {
                 break;
+            }
+
+        if (targetRow == filledRowCount)
+            filledRowCount++;
 
         ui->mainSitesTable->setItem(targetRow, 0, newItem);
 
@@ -95,6 +102,7 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
             ui->mainSitesTable->setItem(targetRow, col, newItem);
         }
     }
+    ui->mainSitesTable->setRowCount(filledRowCount);
 }
 
 
