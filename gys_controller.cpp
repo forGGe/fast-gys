@@ -6,6 +6,7 @@
 
 GYS::Controller::Controller(QObject *parent) noexcept
     :QObject(parent)
+    ,m_storage()
 {
     LOG_ENTRY;
 }

@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
     QObject::connect(&ctrl, &GYS::Controller::sendError,
                      &w, &MainWindow::errorSlot);
 
+    // Notify Controller about start
+    QMetaObject::invokeMethod(&ctrl, "launch", Qt::QueuedConnection);
+
     w.show();
     modelThread.start();
 

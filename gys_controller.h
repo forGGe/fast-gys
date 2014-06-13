@@ -6,6 +6,7 @@
 #include <QMap>
 
 #include "gys_types.h"
+#include "gys_storage.h"
 
 namespace GYS
 {
@@ -63,17 +64,6 @@ signals:
 
 public slots:
     /**
-     * \brief Notify about program to launch
-     *
-     */
-    void launch() noexcept;
-
-    /**
-     * \brief Notify about program to exit
-     */
-    void exit() noexcept;
-
-    /**
      * \brief Loads a file with a given filename
      */
     void loadFile(QString filePath) noexcept;
@@ -107,15 +97,29 @@ public slots:
      */
 
     /**
-     * \defgroup ModelConnectivity Connection between Model and Controller
+     * \defgroup GeneralConnectivily Connection between Controller and environment
      * @{
      */
 signals:
 
 public slots:
     /**
+     * \brief Notify about program to launch
+     *
+     */
+    void launch() noexcept;
+
+    /**
+     * \brief Notify about program to exit
+     */
+    void exit() noexcept;
+
+    /**
      *  }@
      */
+
+private:
+    GYS::Storage m_storage;
 };
 
 
