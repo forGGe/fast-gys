@@ -7,7 +7,8 @@
 
 #include "gys_types.h"
 
-namespace GYS {
+namespace GYS
+{
 
 /**
  * \brief Main and only controller
@@ -27,7 +28,7 @@ public:
     /**
      * \brief The destructor
      */
-    ~Controller();
+    ~Controller() noexcept;
 
     /**
      * \defgroup UIConnectivity Connection between UI and Controller

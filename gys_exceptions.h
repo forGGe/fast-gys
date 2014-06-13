@@ -3,24 +3,44 @@
 
 #include <QString>
 
-namespace GYS {
-class NotImplemented
+namespace GYS
+{
+
+class Exception
 {
 public:
-    NotImplemented(const char *str)
-        :m_str("Funtion is not implemented. ")
+    Exception(const QString &str)
+        :m_str(str)
+    { }
+
+    virtual ~Exception()
     {
-        m_str += str;
+
     }
 
     virtual QString what() const noexcept
     {
         return m_str;
     }
-
-private:
+protected:
     QString m_str;
 };
+
+class NotImplemented : public GYS::Exception
+{
+public:
+    NotImplemented(const QString &str)
+        :Exception("Funtion is not implemented. ")
+    {
+        m_str += str;
+    }
+
+    virtual ~NotImplemented()
+    {
+
+    }
+};
+
 }
 
 

@@ -7,56 +7,96 @@ GYS::CSVFetcher::CSVFetcher()
     ,m_in()
     ,m_rowCount(0)
     ,m_rowNext(0)
+    ,m_nextChar(0)
 {
 }
 
-GYS::CSVFetcher::~CSVFetcher()
+GYS::CSVFetcher::~CSVFetcher() noexcept
 {
     LOG_ENTRY;
-    // TODO: close file here
-    throw GYS::NotImplemented(Q_FUNC_INFO);
+    m_in.flush();
+    m_csvFile.close();
 }
 
-bool GYS::CSVFetcher::setFile(const QString &filePath)
+void GYS::CSVFetcher::setFile(const QString &filePath)
 {
     LOG_ENTRY;
-    // TODO: close previous file here (if such exist)
-    // handle I\O errors, trow exception
-    bool    flag = true;
-    quint32 rows = 0;
-    QString tmp;
-
-    m_csvFile.setFileName(filePath);
-    // TODO: check that file have valid format
-    // does it should check entire file?
-    if (!(flag = m_csvFile.open(QIODevice::ReadOnly)))
+    try
     {
-        // TODO: exception here if file valid, but I\O error occurs
-        return flag;
-    }
+        const int RowLength = 1024;  // Really, why file will contain
+        // entries larger than this?
+        const int valuesCount = 15;  // Count of valid values in one row
 
-    // Figure out how may rows are present
-    m_in.setDevice(&m_csvFile);
-    // TODO: add check for file reading errors, trow exception
-    while(!m_in.atEnd())
+        quint64   rows = 0;          // Total amount of rows
+        quint64   headerSize;        // Size of header line (1st line in file)
+        QString   tmp;               // Temporary string
+        QString   err;               // Contains string describing error
+
+
+        if (filePath.isEmpty())
+            throw GYS::Exception("File path is invalid");
+
+        // Close old one here
+        m_in.flush();
+        if (m_csvFile.isOpen())
+            m_csvFile.close();
+
+        m_csvFile.setFileName(filePath);
+        if (!m_csvFile.open(QIODevice::ReadOnly))
+        {
+            err = QString("Erorr during opening: ") + m_csvFile.errorString();
+            throw GYS::Exception(err);
+        }
+
+        // Figure out how may rows are present
+        m_in.setDevice(&m_csvFile);
+        headerSize = 0; // Use it as a flag as well
+        while(!m_in.atEnd())
+        {
+            int count;
+            tmp = m_in.readLine(RowLength);
+            if (tmp.isNull())
+            {
+                err = QString("Reading failed in row: ")
+                        + QString::number(rows);
+                throw GYS::Exception(err);
+            }
+            if (tmp.length() == RowLength)
+            {
+                err = QString("File contain too long record in row: ")
+                        + QString::number(rows);
+                throw GYS::Exception(err);
+            }
+            if ((count = tmp.count(QRegExp("\"[^\\s]"))) != valuesCount)
+            {
+                err = QString("Row contains invalid values count. "
+                              "Expected: ") + QString::number(valuesCount) +
+                        QString("Got: ") + QString::number(count) +
+                        QString(" Row num: ") + QString::number(rows);
+                throw GYS::Exception(err);
+            }
+            if (!headerSize)
+                headerSize = m_in.pos();
+
+            rows++;
+        }
+
+        m_rowNext = 0;
+        m_rowCount = rows;
+        // Will start reading from next character folowing header
+        m_nextChar = headerSize;
+        m_in.seek(m_nextChar);
+
+    }
+    catch (...)
     {
-        // TODO: add check for maximum line length,
-        // error code should be enough here (file format is wrong)
-        tmp = m_in.readLine();
-        rows++;
+        m_in.flush();
+        m_csvFile.close();
+        m_nextChar = 0;
+        m_rowNext = 0;
+        m_rowCount = 0;
+        throw;
     }
-
-    m_rowNext = 0;
-    m_rowCount = rows;
-
-    // TODO: close file here
-    // it should be opened again when reading will be needed
-    QString header;
-    m_in.seek(0);
-    header = m_in.readLine();
-    qDebug() << "header: " << header;
-
-    return true;
 }
 
 quint32 GYS::CSVFetcher::getRowsCount() const
@@ -77,47 +117,124 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 {
     LOG_ENTRY;
 
-    QString             line;
-    QStringList         list;
-    QRegExp             regx("\\t");
-    GYS::DataTable_Map  table;
-
-    // TODO: Error check!
-
-    regx.setCaseSensitivity(Qt::CaseInsensitive);
-    regx.setPatternSyntax(QRegExp::RegExp2);
-
-    while (!m_in.atEnd() && rowsAmount--)
+    try
     {
-        line = m_in.readLine();
-        line.remove('\"');
-        list = line.split(regx);
+        QString             line;
+        GYS::DataTable_Map  table;
 
-        // HACK!!!!
-        if (list.size() < 3)
-            break;
+        // TODO: Error check!
 
-        // TODO: check for valid string!!!
-        // avoid empty and pamela entries
-        if (!list.at(1).isEmpty() && !(list.at(1) == "pamela"))
+        while (!m_in.atEnd() && rowsAmount--)
         {
-            GYS::DataItem_Pair clientID(GYS::ItemType::NUM_ID, list.at(0));
-            GYS::DataItem_Pair clientName(GYS::ItemType::NAME_ID, list.at(1));
-            GYS::DataItem_Pair dateAdded(GYS::ItemType::DATE_ADDED, list.at(2));
+#if 1
 
-            GYS::DataRow_Vec rowData = { clientID, dateAdded };
+            line = m_in.readLine();
+            line.remove(QChar('\000'));
 
-            table.insert(clientName, rowData);
+            QStringList list = line.split(QChar('\t'));
+            for (auto it = list.begin(); it != list.end(); ++it)
+                it->remove(QChar('\"'));
+
+            GYS::DataItem_Pair clientID;
+
+            if (!list.at(1).isEmpty() && list.at(1) != "pamela")
+            {
+                clientID.first = GYS::ItemType::NAME_ID;
+                clientID.second = list.at(1);
+
+                GYS::DataRow_Vec rowData =
+                {
+                  { GYS::ItemType::NUM_ID, list.at(0) },
+                  { GYS::ItemType::DATE_ADDED, list.at(2) },
+                };
+
+                table.insert(clientID, rowData);
+            }
+
+#else
+
+            GYS::DataItem_Pair  clientID;
+            GYS::DataRow_Vec    rowData;
+
+            bool    nameFound = false;
+            bool    lineParsed = false;
+            int     idx = 0;
+
+            while (idx < 15)
+            {
+                GYS::DataItem_Pair item;
+                GYS::ItemType      type;
+                QString            itemStr;
+
+                // Left quote
+                int left = line.indexOf(QChar('\"'));
+                // Right quote
+                int right = line.indexOf(QChar('\"'), left + 1);
+                int n = right - left;
+
+                if (right == line.length() - 1)
+                    lineParsed = true;
+
+                itemStr = line.left(n + 1);
+                line.remove(left, n + 1);
+
+                itemStr.remove("\"");
+                itemStr = itemStr.simplified();
+                line = line.simplified();
+
+                if (!itemStr.isNull() && !itemStr.isEmpty()) {
+                    switch (idx)
+                    {
+                    case 0:
+                        type = GYS::ItemType::NUM_ID;
+                        break;
+                    case 1:
+                        type = GYS::ItemType::NAME_ID;
+                        break;
+                    case 2:
+                        type = GYS::ItemType::DATE_ADDED;
+                        break;
+                        // Ignore for a while
+                    default:
+                        type = GYS::ItemType::INVALID_TYPE;
+                        break;
+                    }
+                    if (type == GYS::ItemType::NAME_ID)
+                    {
+                        clientID.first = type;
+                        clientID.second = itemStr;
+                        nameFound = true;
+                    }
+                    else if (type != GYS::ItemType::INVALID_TYPE)
+                    {
+                        item.first = type;
+                        item.second = itemStr;
+                        rowData.push_back(item);
+                    }
+                }
+                idx++;
+            }
+
+            if (nameFound)
+            {
+                table.insert(clientID, rowData);
+            }
+#endif
+            m_rowNext++;
         }
 
-        m_rowNext++;
+        // Format:
+        // "Client ID" -->"Login"<-- "Added" "Inviter" "Manager (Publishers)"
+        // "Manager (Products)" "Manager (News)" "Manager (Audience Development)"
+        // "Manager (Banners)" "Status" "MG-Wallet" "Current balance" "Totally spent"
+        // "Totally paid" "Last replenishment date"
+
+        return table;
     }
-    // Format:
-    // "Client ID" -->"Login"<-- "Added" "Inviter" "Manager (Publishers)"
-    // "Manager (Products)" "Manager (News)" "Manager (Audience Development)"
-    // "Manager (Banners)" "Status" "MG-Wallet" "Current balance" "Totally spent"
-    // "Totally paid" "Last replenishment date"
-    return table;
+    catch (...)
+    {
+        throw;
+    }
 }
 
 GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 startRow, quint32 endRow) const

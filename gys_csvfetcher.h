@@ -8,7 +8,8 @@
 
 class QString;
 
-namespace GYS {
+namespace GYS
+{
 
 /**
  * \brief Fetches data present in CVS file
@@ -17,7 +18,7 @@ class CSVFetcher
 {
 public:
     CSVFetcher();
-    ~CSVFetcher();
+    ~CSVFetcher() noexcept;
 
     /**
      * \brief Sets file to operate on
@@ -25,7 +26,7 @@ public:
      * \param[in] filePath Path of the CSV file.
      * \return status of the operation.
      */
-    bool setFile(const QString& filePath);
+    void setFile(const QString& filePath);
 
     /**
      * \brief Gets total amount of rows in the file
@@ -80,9 +81,10 @@ public:
 
 private:
     QFile       m_csvFile;    /**< Target file */
-    QTextStream m_in;        /**< Stream for reading */
-    quint32     m_rowCount;   /**< Amount of rows inside a file */
-    quint32     m_rowNext;    /**< Next row for reading */
+    QTextStream m_in;         /**< Stream for reading */
+    quint64     m_rowCount;   /**< Amount of rows inside a file */
+    quint64     m_rowNext;    /**< Next row for readin, excluding header */
+    quint64     m_nextChar;   /**< Next char to read. Need here to seek streams */
 };
 
 }

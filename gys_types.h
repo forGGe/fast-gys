@@ -7,7 +7,8 @@
 #include <QString>
 #include <QDebug>
 
-namespace GYS {
+namespace GYS
+{
 
 // TODO: make it familiar with next stuff:
 // "Client ID" "Login" "Added" "Inviter" "Manager (Publishers)"
@@ -20,6 +21,11 @@ namespace GYS {
  */
 enum class ItemType
 {
+    /**
+     * Obvious, to represent invalid type
+     */
+    INVALID_TYPE,
+
     /**
      * Specifies that given item is a parent key for accociated data
      */
