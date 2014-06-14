@@ -1,5 +1,11 @@
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonDocument>
+
 #include "gys_storage.h"
 #include "gys_exceptions.h"
+
 
 GYS::Storage::Storage() noexcept
 {
@@ -11,7 +17,34 @@ GYS::Storage::~Storage()
 
 void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
 {
-    throw GYS::NotImplemented(Q_FUNC_INFO);
+    //throw GYS::NotImplemented(Q_FUNC_INFO);
+    // May be better to use XML here, since its supports streams associated with devices?
+
+    GYS::DataItem_Pair name = records.begin().key();
+    GYS::DataRow_Vec row = records.begin().value();
+
+
+    QJsonValue dateAdded(row.at(1).second);
+    QJsonValue clientID(row.at(0).second);
+    QJsonObject clientDataObj;
+    clientDataObj.insert("ClientID", clientID);
+    clientDataObj.insert("DateAdded", dateAdded);
+
+    QJsonValue clientData(clientDataObj);
+    QJsonObject singleSiteDataObj;
+    singleSiteDataObj.insert("ClientData", clientData);
+
+    QJsonValue singleSite(singleSiteDataObj);
+    QJsonObject sites;
+    sites.insert(name.second, singleSite);
+
+    //    QJsonValue worldRank(QJsonValue::String);
+    //    QJsonValue alexaData(QJsonValue::Object);
+
+    QJsonDocument jsonDoc(sites);
+    QString str = jsonDoc.toJson();
+
+    qDebug() << str;
 }
 
 GYS::DataTable_Map GYS::Storage::getNextRecords(quint64 amount) const

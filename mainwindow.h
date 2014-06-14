@@ -28,7 +28,6 @@ private:
     Ui::MainWindow *ui;
 
 signals:
-    void launching();
     void exiting();
     void requestLoadFile(QString file_name);
     void requestUpdateRating(QList< QString > sites);

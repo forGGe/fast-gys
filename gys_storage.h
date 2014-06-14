@@ -2,6 +2,7 @@
 #define GYS_STORAGE_H
 
 #include <QObject>
+#include <QFile>
 
 #include "gys_types.h"
 
@@ -27,6 +28,9 @@ public:
     // Resets get position, so next call to getNextRecords() will start from
     // beginning of storage
     void resetGetPosition();
+
+    // Flushes all caches into disk storage
+    void flush() noexcept;
 
     // Adds record and extends missing data if it was previously created
     // return true if record already existed
@@ -65,6 +69,8 @@ public:
                                const QString            &refname) const;
 
 private:
+    QFile       m_jsonFile;     // File containing json data
+    QTextStream m_jsonStream;   // Stream to hold data
 };
 
 

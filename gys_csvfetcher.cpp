@@ -116,6 +116,7 @@ quint32 GYS::CSVFetcher::getNextRowIdx() const
 GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 {
     LOG_ENTRY;
+    // TODO: improve error checks
 
     try
     {

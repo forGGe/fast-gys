@@ -20,8 +20,6 @@ int main(int argc, char *argv[])
     ctrl.moveToThread(&modelThread);
 
     // Setup connections UI -> Controller
-    QObject::connect(&w, &MainWindow::launching,
-                     &ctrl, &GYS::Controller::launch);
     QObject::connect(&w, &MainWindow::exiting,
                      &ctrl, &GYS::Controller::exit);
     QObject::connect(&w, &MainWindow::requestLoadFile,

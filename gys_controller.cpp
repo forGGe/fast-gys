@@ -18,8 +18,26 @@ GYS::Controller::~Controller() noexcept
 
 void GYS::Controller::launch() noexcept
 {
+    // TODO: improve error checks
     LOG_ENTRY;
-    emit sendError("Lauch preparation not implemented");
+#if 0 // Not catches all exceptions yet
+    try
+    {
+        GYS::DataTable_Map toSend;
+        const quint64 amount = 256;
+
+        emit launched();
+        while ((toSend = m_storage.getNextRecords(256)).size())
+        {
+            emit sendSitesData(toSend);
+        }
+        m_storage.resetGetPosition();
+    }
+    catch (...)
+    {
+        emit sendError("Lauch preparation failed");
+    }
+#endif
 }
 
 void GYS::Controller::exit() noexcept
@@ -47,6 +65,7 @@ void GYS::Controller::loadFile(QString filePath) noexcept
         for (quint32 i = 0; i < iters; i++)
         {
             table = fetcher.getData(rowsPerSend);
+            m_storage.addRecords(table);
             emit sendSitesData(table);
         }
     }
