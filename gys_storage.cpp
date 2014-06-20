@@ -1,7 +1,13 @@
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonValue>
-#include <QJsonDocument>
+//#include <QJsonArray>
+//#include <QJsonObject>
+//#include <QJsonValue>
+//#include <QJsonDocument>
+
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QTextStream>
+#include <QFile>
+
 
 #include "gys_storage.h"
 #include "gys_exceptions.h"
@@ -20,33 +26,75 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
     //throw GYS::NotImplemented(Q_FUNC_INFO);
     // May be better to use XML here, since its supports streams associated with devices?
 
- #if 0
-    GYS::DataItem_Pair name = records.begin().key();
-    GYS::DataRow_Vec row = records.begin().value();
+    if (QFile::exists("storage_tmp.xml"))
+        QFile::remove("storage_tmp.xml");
 
+    QFile outFile("storage_tmp.xml");
+    outFile.open(QIODevice::WriteOnly);
+    QXmlStreamWriter outStream(&outFile);
+    outStream.setAutoFormatting(true);
 
-    QJsonValue dateAdded(row.at(1).second);
-    QJsonValue clientID(row.at(0).second);
-    QJsonObject clientDataObj;
-    clientDataObj.insert("ClientID", clientID);
-    clientDataObj.insert("DateAdded", dateAdded);
+    outStream.writeStartDocument();
+    outStream.writeStartElement("root");
 
-    QJsonValue clientData(clientDataObj);
-    QJsonObject singleSiteDataObj;
-    singleSiteDataObj.insert("ClientData", clientData);
+    for (auto it = records.begin(); it != records.end(); ++it) {
+        outStream.writeStartElement("client");
+        outStream.writeAttribute("name", it.key().second);
+        //outStream.writeTextElement("placeholder", "placeholder value");
+        outStream.writeEndElement();
+    }
 
-    QJsonValue singleSite(singleSiteDataObj);
-    QJsonObject sites;
-    sites.insert(name.second, singleSite);
+    if (QFile::exists("storage.xml"))
+    {
+        QFile inFile("storage.xml");
+        inFile.open(QIODevice::ReadOnly);
+        QXmlStreamReader inStream(&inFile);
 
-    //    QJsonValue worldRank(QJsonValue::String);
-    //    QJsonValue alexaData(QJsonValue::Object);
+        // Re-read whole file :(
+        while (!inStream.atEnd())
+        {
+            inStream.readNext();
+            qDebug() << inStream.tokenString();
+            if (!inStream.error())
+            {
+                switch (inStream.tokenType())
+                {
+                case QXmlStreamReader::StartElement:
+                case QXmlStreamReader::EndElement:
+                    qDebug() << "Elem " << inStream.name().toString();
+                    if (inStream.name().toString() != "root")
+                    {
+                        outStream.writeCurrentToken(inStream);
+                    }
+                    break;
+                case QXmlStreamReader::Characters:
+                case QXmlStreamReader::Comment:
+                case QXmlStreamReader::DTD:
+                    qDebug() << "Chars " << inStream.text();
+                    outStream.writeCurrentToken(inStream);
+                    break;
+                default:
+                    break;
+                }
 
-    QJsonDocument jsonDoc(sites);
-    QString str = jsonDoc.toJson();
+            }
+            else
+            {
+                qDebug() << "Error " << inStream.errorString()
+                         << "line " << inStream.lineNumber() << "column "
+                         << inStream.columnNumber() << "char "
+                         << inStream.characterOffset();
+            }
+        }
+        inFile.close();
+    }
 
-    qDebug() << str;
-#endif
+    outStream.writeEndElement();
+    outStream.writeEndDocument();
+    outFile.close();
+
+    QFile::remove("storage.xml");
+    QFile::rename("storage_tmp.xml", "storage.xml");
 }
 
 GYS::DataTable_Map GYS::Storage::getNextRecords(quint64 amount) const
