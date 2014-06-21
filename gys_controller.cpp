@@ -20,24 +20,23 @@ void GYS::Controller::launch() noexcept
 {
     // TODO: improve error checks
     LOG_ENTRY;
-#if 0 // Not catches all exceptions yet
+
     try
     {
         GYS::DataTable_Map toSend;
         const quint64 amount = 256;
+        m_storage.resetGetPosition();
 
         emit launched();
-        while ((toSend = m_storage.getNextRecords(256)).size())
-        {
+        while ((toSend = m_storage.getNextRecords(amount)).size() > 0)
             emit sendSitesData(toSend);
-        }
-        m_storage.resetGetPosition();
+
+        emit launched();
     }
     catch (...)
     {
         emit sendError("Lauch preparation failed");
     }
-#endif
 }
 
 void GYS::Controller::exit() noexcept
@@ -58,7 +57,6 @@ void GYS::Controller::loadFile(QString filePath) noexcept
         quint32     iters; // Iterations needed to send all file data
 
         fetcher.setFile(filePath);
-        emit fileLoaded();
 
         rows = fetcher.getRowsCount();
         iters = rows / rowsPerSend + 1;
@@ -68,6 +66,8 @@ void GYS::Controller::loadFile(QString filePath) noexcept
             m_storage.addRecords(table);
             emit sendSitesData(table);
         }
+
+        emit fileLoaded();
     }
     catch (GYS::Exception &e)
     {

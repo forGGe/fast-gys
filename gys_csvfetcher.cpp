@@ -138,6 +138,7 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 
             GYS::DataItem_Pair clientID;
 
+            // TODO: check for valid site name
             if (!list.at(1).isEmpty() && list.at(1) != "pamela")
             {
                 clientID.first = GYS::ItemType::NAME_ID;

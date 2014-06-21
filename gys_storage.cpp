@@ -3,129 +3,182 @@
 //#include <QJsonValue>
 //#include <QJsonDocument>
 
-#include <QXmlStreamWriter>
-#include <QXmlStreamReader>
-#include <QTextStream>
-#include <QFile>
+//#include <QXmlStreamWriter>
+//#include <QXmlStreamReader>
+//#include <QTextStream>
+//#include <QFile>
 
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QVariantList>
 
 #include "gys_storage.h"
 #include "gys_exceptions.h"
 
 
 GYS::Storage::Storage() noexcept
+    :m_db(QSqlDatabase::addDatabase("QSQLITE"))
+    ,m_row(0)
 {
+    LOG_ENTRY;
+    // TODO: check for valid database
+    // TODO: error checks
+    bool ok;
+
+    m_db.setDatabaseName("default.db");
+    m_db.setUserName("user");
+    m_db.setPassword("pass");
+    ok = m_db.open();
+    qDebug() << ok;
+
+    QString createTable(
+                "CREATE TABLE Sites "
+                "( "
+                "site_key INTEGER PRIMARY KEY, "
+                "site_id TEXT, "
+                "name TEXT UNIQUE, "
+                "date TEXT "
+                ") "
+                );
+    QSqlQuery query;
+    ok = query.exec(createTable);
+    qDebug() << ok;
+
+    if (!ok)
+    {
+        qDebug() << query.lastError().type();
+        qDebug() << query.lastError().text();
+    }
+
+    while(query.next())
+    {
+        qDebug() << query.value(0);
+    }
+
+    query.finish();
 }
 
 GYS::Storage::~Storage()
 {
+    LOG_ENTRY;
+    m_db.commit();
+    m_db.close();
 }
 
 void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
 {
-    //throw GYS::NotImplemented(Q_FUNC_INFO);
-    // May be better to use XML here, since its supports streams associated with devices?
+    LOG_ENTRY;
+    // TODO: too straitforward
+    // TODO: erorr checks
+    QVariantList siteIDs;
+    QVariantList siteNames;
+    QVariantList dates;
 
-    if (QFile::exists("storage_tmp.xml"))
-        QFile::remove("storage_tmp.xml");
-
-    QFile outFile("storage_tmp.xml");
-    outFile.open(QIODevice::WriteOnly);
-    QXmlStreamWriter outStream(&outFile);
-    outStream.setAutoFormatting(true);
-
-    outStream.writeStartDocument();
-    outStream.writeStartElement("root");
-
-    for (auto it = records.begin(); it != records.end(); ++it) {
-        outStream.writeStartElement("client");
-        outStream.writeAttribute("name", it.key().second);
-        //outStream.writeTextElement("placeholder", "placeholder value");
-        outStream.writeEndElement();
-    }
-
-    if (QFile::exists("storage.xml"))
+    QSqlQuery query(m_db);
+    query.prepare(
+                "INSERT INTO "
+                "Sites (site_id, name, date) "
+                "VALUES (?, ?, ?) "
+                );
+    for (auto it = records.begin(); it != records.end(); ++it)
     {
-        QFile inFile("storage.xml");
-        inFile.open(QIODevice::ReadOnly);
-        QXmlStreamReader inStream(&inFile);
 
-        // Re-read whole file :(
-        while (!inStream.atEnd())
-        {
-            inStream.readNext();
-            qDebug() << inStream.tokenString();
-            if (!inStream.error())
-            {
-                switch (inStream.tokenType())
-                {
-                case QXmlStreamReader::StartElement:
-                case QXmlStreamReader::EndElement:
-                    qDebug() << "Elem " << inStream.name().toString();
-                    if (inStream.name().toString() != "root")
-                    {
-                        outStream.writeCurrentToken(inStream);
-                    }
-                    break;
-                case QXmlStreamReader::Characters:
-                case QXmlStreamReader::Comment:
-                case QXmlStreamReader::DTD:
-                    qDebug() << "Chars " << inStream.text();
-                    outStream.writeCurrentToken(inStream);
-                    break;
-                default:
-                    break;
-                }
-
-            }
-            else
-            {
-                qDebug() << "Error " << inStream.errorString()
-                         << "line " << inStream.lineNumber() << "column "
-                         << inStream.columnNumber() << "char "
-                         << inStream.characterOffset();
-            }
-        }
-        inFile.close();
+        GYS::DataRow_Vec row = it.value();
+        siteIDs << row.at(0).second;
+        dates << row.at(1).second;
+        siteNames << it.key().second;
     }
 
-    outStream.writeEndElement();
-    outStream.writeEndDocument();
-    outFile.close();
+    query.addBindValue(siteIDs);
+    query.addBindValue(siteNames);
+    query.addBindValue(dates);
 
-    QFile::remove("storage.xml");
-    QFile::rename("storage_tmp.xml", "storage.xml");
+    if (!query.execBatch())
+    {
+        qDebug() << query.lastError().type();
+        qDebug() << query.lastError().text();
+    }
+
+    query.finish();
 }
 
-GYS::DataTable_Map GYS::Storage::getNextRecords(quint64 amount) const
+GYS::DataTable_Map GYS::Storage::getNextRecords(quint64 amount)
 {
-    throw GYS::NotImplemented(Q_FUNC_INFO);
+    LOG_ENTRY;
+
+    // TODO: error checks
+    // TODO: BUG HERE!
+    // It executes and sents not more than 3800 items of overall 3970
+    QSqlQuery query(m_db);
+    GYS::DataTable_Map table;
+    quint64 got = 0;
+    query.setForwardOnly(true);
+    query.prepare(
+                "SELECT site_id, name, date "
+                "FROM Sites "
+                "LIMIT :amount OFFSET :offset "
+                );
+
+    query.bindValue(":amount", amount);
+    query.bindValue(":offset", m_row);
+
+    if (!query.exec())
+    {
+        qDebug() << query.lastError().type();
+        qDebug() << query.lastError().text();
+    }
+
+    while (query.next())
+    {
+        GYS::DataItem_Pair site_id =
+        { GYS::ItemType::NUM_ID, query.value(0).toString() };
+        GYS::DataItem_Pair key =
+        { GYS::ItemType::NAME_ID, query.value(1).toString() };
+        GYS::DataItem_Pair date =
+        { GYS::ItemType::DATE_ADDED, query.value(2).toString() };
+
+        GYS::DataRow_Vec row = { site_id, date };
+        table.insert(key, row);
+        got++;
+    }
+
+    m_row += got;
+
+    query.finish();
+
+    return table;
+
 }
 
 void GYS::Storage::resetGetPosition()
 {
-    throw GYS::NotImplemented(Q_FUNC_INFO);
+    LOG_ENTRY;
+    m_row = 0;
 }
 
 bool GYS::Storage::addRecord(const GYS::DataItem_Pair   &record,
                              const GYS::DataRow_Vec     &data)
 {
+    LOG_ENTRY;
     throw GYS::NotImplemented(Q_FUNC_INFO);
 }
 
 bool GYS::Storage::overwriteRecord(const GYS::DataItem_Pair &record,
                                    const GYS::DataRow_Vec   &data)
 {
+    LOG_ENTRY;
     throw GYS::NotImplemented(Q_FUNC_INFO);
 }
 
 GYS::DataRow_Vec GYS::Storage::getRecordData(const GYS::DataItem_Pair &record) const
 {
+    LOG_ENTRY;
     throw GYS::NotImplemented(Q_FUNC_INFO);
 }
 
 GYS::DataTable_Map GYS::Storage::getRecordsData(const GYS::DataRow_Vec &records) const
 {
+    LOG_ENTRY;
     throw GYS::NotImplemented(Q_FUNC_INFO);
 }
 
@@ -133,11 +186,13 @@ bool GYS::Storage::referRecords(const GYS::DataItem_Pair &record,
                                 const QString            &refName,
                                 const GYS::DataRow_Vec   &references)
 {
+    LOG_ENTRY;
     throw GYS::NotImplemented(Q_FUNC_INFO);
 }
 
 GYS::DataRow_Vec GYS::Storage::getRefers(const GYS::DataItem_Pair &record,
                                          const QString            &refname) const
 {
+    LOG_ENTRY;
     throw GYS::NotImplemented(Q_FUNC_INFO);
 }

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QFile>
+#include <QSqlDatabase>
 
 #include "gys_types.h"
 
@@ -23,7 +24,7 @@ public:
     // It will start reading records from storage start,
     // each next call will return records placed after last previous record got
     // Table contains less or 0 elements, if there are no records left
-    GYS::DataTable_Map getNextRecords(quint64 amount) const;
+    GYS::DataTable_Map getNextRecords(quint64 amount);
 
     // Resets get position, so next call to getNextRecords() will start from
     // beginning of storage
@@ -68,9 +69,12 @@ public:
     GYS::DataRow_Vec getRefers(const GYS::DataItem_Pair &record,
                                const QString            &refname) const;
 
+    // Clears storage, deleting all items
+    bool clearStorage();
+
 private:
-    QFile       m_jsonFile;     // File containing json data
-    QTextStream m_jsonStream;   // Stream to hold data
+    QSqlDatabase m_db;  // Database to hold values
+    quint64      m_row; // Current row that storage operates on
 };
 
 
