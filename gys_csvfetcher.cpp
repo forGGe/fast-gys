@@ -61,21 +61,21 @@ void GYS::CSVFetcher::setFile(const QString &filePath)
             if (tmp.isNull())
             {
                 err = QString("Reading failed in row: ")
-                        + QString::number(rows);
+                      + QString::number(rows);
                 throw GYS::Exception(err);
             }
             if (tmp.length() == RowLength)
             {
                 err = QString("File contain too long record in row: ")
-                        + QString::number(rows);
+                      + QString::number(rows);
                 throw GYS::Exception(err);
             }
             if ((count = tmp.count(QRegExp("\"[^\\s]"))) != valuesCount)
             {
                 err = QString("Row contains invalid values count. "
                               "Expected: ") + QString::number(valuesCount) +
-                        QString("Got: ") + QString::number(count) +
-                        QString(" Row num: ") + QString::number(rows);
+                      QString("Got: ") + QString::number(count) +
+                      QString(" Row num: ") + QString::number(rows);
                 throw GYS::Exception(err);
             }
             if (!headerSize)
@@ -126,7 +126,7 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
         QString             line;
         GYS::DataTable_Map  table;
 
-        // TODO: Error check!
+        // TODO: Error check & exceptions!
 
         while (!m_in.atEnd() && rowsAmount--)
         {
@@ -139,7 +139,6 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 
             GYS::DataItem_Pair clientID;
 
-            // TODO: check for valid site name
             if (!list.at(1).isEmpty())
             {
                 QRegularExpression nameRegx("^[\\w-]+(\\.[\\w-]+)+$");
@@ -152,8 +151,10 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 
                     GYS::DataRow_Vec rowData =
                     {
-                      { GYS::ItemType::NUM_ID, list.at(0) },
-                      { GYS::ItemType::DATE_ADDED, list.at(2) },
+                        { GYS::ItemType::NUM_ID, list.at(0) },
+                        // TODO: For now it doesn't needed
+                        // should be removed
+                        { GYS::ItemType::DATE_ADDED, list.at(2) },
                     };
 
                     table.insert(clientID, rowData);
@@ -166,12 +167,6 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 
             m_rowNext++;
         }
-
-        // Format:
-        // "Client ID" -->"Login"<-- "Added" "Inviter" "Manager (Publishers)"
-        // "Manager (Products)" "Manager (News)" "Manager (Audience Development)"
-        // "Manager (Banners)" "Status" "MG-Wallet" "Current balance" "Totally spent"
-        // "Totally paid" "Last replenishment date"
 
         return table;
     }

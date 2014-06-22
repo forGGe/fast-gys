@@ -1,13 +1,3 @@
-//#include <QJsonArray>
-//#include <QJsonObject>
-//#include <QJsonValue>
-//#include <QJsonDocument>
-
-//#include <QXmlStreamWriter>
-//#include <QXmlStreamReader>
-//#include <QTextStream>
-//#include <QFile>
-
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QVariantList>
@@ -68,6 +58,11 @@ GYS::Storage::~Storage()
 void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
 {
     LOG_ENTRY;
+
+    // Let's not waste any resourses
+    if (!records.size())
+        return;
+
     // TODO: too straitforward
     // TODO: erorr checks
     QVariantList siteIDs;
@@ -82,7 +77,6 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
                 );
     for (auto it = records.begin(); it != records.end(); ++it)
     {
-
         GYS::DataRow_Vec row = it.value();
         siteIDs << row.at(0).second;
         dates << row.at(1).second;

@@ -65,8 +65,11 @@ void GYS::Controller::loadFile(QString filePath) noexcept
         for (quint32 i = 0; i < iters; i++)
         {
             table = fetcher.getData(rowsPerSend);
-            m_storage.addRecords(table);
-            emit sendSitesData(table);
+            if (table.size())
+            {
+                m_storage.addRecords(table);
+                emit sendSitesData(table);
+            }
         }
 
         emit fileLoaded();
@@ -105,31 +108,6 @@ void GYS::Controller::updateRating(QList< QString > sites) noexcept
 void GYS::Controller::updateAll() noexcept
 {
     LOG_ENTRY;
-
-#if 0
-    // TODO: next code is used as an example
-    // should be removed
-    GYS::DataRow_Vec site1_row =
-    {
-        { GYS::ItemType::REGION_ID, "US" },
-        { GYS::ItemType::REGION_RANK, "10" },
-    };
-
-    GYS::DataRow_Vec site2_row =
-    {
-        { GYS::ItemType::REGION_ID, "RU" },
-        { GYS::ItemType::REGION_RANK, "210" },
-    };
-
-    GYS::DataTable_Map data =
-    {
-        { { GYS::ItemType::NAME_ID, "ololoshka.com" }, site2_row },
-        { { GYS::ItemType::NAME_ID, "facetable.com" }, site1_row },
-    };
-
-    emit sendSitesData(data);
-#endif
-
     emit sendError("Updating not implemented");
 }
 
