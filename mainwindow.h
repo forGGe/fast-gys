@@ -18,12 +18,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+protected:
+    virtual void keyPressEvent(QKeyEvent *event);
+
 private slots:
     void on_btnExit_clicked();
     void on_btnLoadFile_clicked();
-
     void on_btnUpdateAll_clicked();
-
     void on_mainSitesTable_cellClicked(int row, int column);
 
 private:

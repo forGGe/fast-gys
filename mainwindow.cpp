@@ -2,6 +2,9 @@
 #include <QMessageBox>
 #include <QVariant>
 #include <QDesktopServices>
+#include <QKeyEvent>
+#include <QTableWidgetSelectionRange>
+#include <QClipboard>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -18,6 +21,47 @@ MainWindow::~MainWindow()
 {
     LOG_ENTRY;
     delete ui;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event == QKeySequence::Copy)
+    {
+        qDebug() << "Copy event occurs";
+        QList< QTableWidgetSelectionRange > ranges = ui->mainSitesTable->selectedRanges();
+        for (auto it = ranges.begin(); it != ranges.end(); ++it)
+        {
+            // For now - iterate and overwrite clipboard with latest selected data
+            // In order to paste items in Excel clipboard should contain
+            // cells separated with tabs and rows separated by new line
+            QClipboard *clipboard = QApplication::clipboard();
+            QString text;
+            for (int row = it->topRow(); row < it->bottomRow() + 1; row++)
+            {
+                for (int col = it->leftColumn(); col < it->rightColumn() + 1; col++)
+                {
+                    // Mark empty item with whitespace
+                    QTableWidgetItem *item = ui->mainSitesTable->item(row, col);
+                    if (item)
+                        text += item->text();
+                    else
+                        text += " ";
+
+                    text += '\t';
+                }
+
+                text += '\n';
+            }
+
+            qDebug() << text;
+
+            clipboard->setText(text);
+        }
+        event->accept();
+        return;
+    }
+
+    event->ignore();
 }
 
 void MainWindow::on_btnExit_clicked()
