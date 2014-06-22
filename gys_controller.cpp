@@ -24,10 +24,9 @@ void GYS::Controller::launch() noexcept
     try
     {
         GYS::DataTable_Map toSend;
-        const quint64 amount = 256;
+        const quint64 amount = 1024;
         m_storage.resetGetPosition();
 
-        emit launched();
         while ((toSend = m_storage.getNextRecords(amount)).size() > 0)
             emit sendSitesData(toSend);
 
@@ -53,13 +52,16 @@ void GYS::Controller::loadFile(QString filePath) noexcept
         GYS::CSVFetcher     fetcher;
         GYS::DataTable_Map  table;
         quint32     rows;
-        const int   rowsPerSend = 256; // Amount of rows to send in one chunk
+        const int   rowsPerSend = 32; // Amount of rows to send in one chunk
         quint32     iters; // Iterations needed to send all file data
 
         fetcher.setFile(filePath);
 
         rows = fetcher.getRowsCount();
         iters = rows / rowsPerSend + 1;
+        m_storage.clearStorage();
+        emit allDataDeleted();
+
         for (quint32 i = 0; i < iters; i++)
         {
             table = fetcher.getData(rowsPerSend);

@@ -62,6 +62,11 @@ signals:
      */
     void sendError(QString descr);
 
+    /**
+     * \brief Signals that all data was deleted
+     */
+    void allDataDeleted();
+
 public slots:
     /**
      * \brief Loads a file with a given filename

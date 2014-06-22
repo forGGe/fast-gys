@@ -27,13 +27,24 @@ void MainWindow::on_btnExit_clicked()
 void MainWindow::lauchDone()
 {
     LOG_ENTRY;
+    QMessageBox msgBox;
+    msgBox.setText("Database loaded!");
+    msgBox.exec();
+}
 
+void MainWindow::clearTable()
+{
+    LOG_ENTRY;
+    qDebug() << ui->mainSitesTable->rowCount();
+    ui->mainSitesTable->setRowCount(0);
 }
 
 void MainWindow::fileLoadingDone()
 {
     LOG_ENTRY;
-
+    QMessageBox msgBox;
+    msgBox.setText("CSV File loaded!");
+    msgBox.exec();
 }
 
 void MainWindow::recieveSitesData(GYS::DataTable_Map data)
@@ -108,7 +119,7 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 
 void MainWindow::errorSlot(QString descr)
 {
-    // TODO: Message box
+    LOG_ENTRY;
     QMessageBox msgBox;
     msgBox.setText(descr);
     msgBox.exec();

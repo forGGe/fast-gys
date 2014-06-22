@@ -84,7 +84,7 @@ using DataTable_Map  = QMap< GYS::DataItem_Pair, GYS::DataRow_Vec >;
 
 }
 
-#define LOG_ENTRY do { qDebug() << "Entered: " << __func__; } while(0)
+#define LOG_ENTRY do { qDebug() << "Entered: " << Q_FUNC_INFO; } while(0)
 
 // Declarations to make possible use new types in queued connections
 Q_DECLARE_METATYPE(GYS::DataItem_Pair)

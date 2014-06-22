@@ -38,6 +38,7 @@ signals:
 public slots:
     void lauchDone();
     void fileLoadingDone();
+    void clearTable();
     void recieveSitesData(GYS::DataTable_Map data);
     void errorSlot(QString descr);
 };

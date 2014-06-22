@@ -196,3 +196,16 @@ GYS::DataRow_Vec GYS::Storage::getRefers(const GYS::DataItem_Pair &record,
     LOG_ENTRY;
     throw GYS::NotImplemented(Q_FUNC_INFO);
 }
+
+void GYS::Storage::clearStorage()
+{
+    LOG_ENTRY;
+    QSqlQuery query(m_db);
+    query.prepare("DELETE FROM Sites");
+    if (!query.exec())
+    {
+        qDebug() << query.lastError().type();
+        qDebug() << query.lastError().text();
+    }
+}
+

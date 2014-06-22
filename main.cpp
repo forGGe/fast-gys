@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
                      &w, &MainWindow::recieveSitesData);
     QObject::connect(&ctrl, &GYS::Controller::sendError,
                      &w, &MainWindow::errorSlot);
+    QObject::connect(&ctrl, &GYS::Controller::allDataDeleted,
+                     &w, &MainWindow::clearTable);
 
     // Notify Controller about start
     QMetaObject::invokeMethod(&ctrl, "launch", Qt::QueuedConnection);

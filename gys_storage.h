@@ -70,7 +70,7 @@ public:
                                const QString            &refname) const;
 
     // Clears storage, deleting all items
-    bool clearStorage();
+    void clearStorage();
 
 private:
     QSqlDatabase m_db;  // Database to hold values

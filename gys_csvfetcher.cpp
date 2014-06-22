@@ -1,3 +1,6 @@
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+
 #include "gys_exceptions.h"
 #include "gys_csvfetcher.h"
 
@@ -127,8 +130,6 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 
         while (!m_in.atEnd() && rowsAmount--)
         {
-#if 1
-
             line = m_in.readLine();
             line.remove(QChar('\000'));
 
@@ -139,89 +140,30 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
             GYS::DataItem_Pair clientID;
 
             // TODO: check for valid site name
-            if (!list.at(1).isEmpty() && list.at(1) != "pamela")
+            if (!list.at(1).isEmpty())
             {
-                clientID.first = GYS::ItemType::NAME_ID;
-                clientID.second = list.at(1);
+                QRegularExpression nameRegx("^[\\w-]+(\\.[\\w-]+)+$");
+                QRegularExpressionMatch nameMatch = nameRegx.match(list.at(1));
 
-                GYS::DataRow_Vec rowData =
+                if (nameMatch.hasMatch())
                 {
-                  { GYS::ItemType::NUM_ID, list.at(0) },
-                  { GYS::ItemType::DATE_ADDED, list.at(2) },
-                };
+                    clientID.first = GYS::ItemType::NAME_ID;
+                    clientID.second = nameMatch.captured();
 
-                table.insert(clientID, rowData);
-            }
-
-#else
-
-            GYS::DataItem_Pair  clientID;
-            GYS::DataRow_Vec    rowData;
-
-            bool    nameFound = false;
-            bool    lineParsed = false;
-            int     idx = 0;
-
-            while (idx < 15)
-            {
-                GYS::DataItem_Pair item;
-                GYS::ItemType      type;
-                QString            itemStr;
-
-                // Left quote
-                int left = line.indexOf(QChar('\"'));
-                // Right quote
-                int right = line.indexOf(QChar('\"'), left + 1);
-                int n = right - left;
-
-                if (right == line.length() - 1)
-                    lineParsed = true;
-
-                itemStr = line.left(n + 1);
-                line.remove(left, n + 1);
-
-                itemStr.remove("\"");
-                itemStr = itemStr.simplified();
-                line = line.simplified();
-
-                if (!itemStr.isNull() && !itemStr.isEmpty()) {
-                    switch (idx)
+                    GYS::DataRow_Vec rowData =
                     {
-                    case 0:
-                        type = GYS::ItemType::NUM_ID;
-                        break;
-                    case 1:
-                        type = GYS::ItemType::NAME_ID;
-                        break;
-                    case 2:
-                        type = GYS::ItemType::DATE_ADDED;
-                        break;
-                        // Ignore for a while
-                    default:
-                        type = GYS::ItemType::INVALID_TYPE;
-                        break;
-                    }
-                    if (type == GYS::ItemType::NAME_ID)
-                    {
-                        clientID.first = type;
-                        clientID.second = itemStr;
-                        nameFound = true;
-                    }
-                    else if (type != GYS::ItemType::INVALID_TYPE)
-                    {
-                        item.first = type;
-                        item.second = itemStr;
-                        rowData.push_back(item);
-                    }
+                      { GYS::ItemType::NUM_ID, list.at(0) },
+                      { GYS::ItemType::DATE_ADDED, list.at(2) },
+                    };
+
+                    table.insert(clientID, rowData);
                 }
-                idx++;
+                else
+                {
+                    qDebug() << list.at(1) << " is not a site name!";
+                }
             }
 
-            if (nameFound)
-            {
-                table.insert(clientID, rowData);
-            }
-#endif
             m_rowNext++;
         }
 
