@@ -24,6 +24,8 @@ private slots:
 
     void on_btnUpdateAll_clicked();
 
+    void on_mainSitesTable_cellClicked(int row, int column);
+
 private:
     Ui::MainWindow *ui;
 

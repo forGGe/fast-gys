@@ -36,17 +36,12 @@
        <widget class="QTableWidget" name="mainSitesTable">
         <column>
          <property name="text">
-          <string>Client name</string>
+          <string>Site ID</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Client ID</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Date added</string>
+          <string>Site name</string>
          </property>
         </column>
         <column>

@@ -1,5 +1,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QVariant>
+#include <QDesktopServices>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -53,14 +55,18 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
     int gotRows = data.size();
     int targetRow;
     int filledRowCount;
+
     QTableWidgetItem *newItem = NULL;
+    QFont urlFont;
+
+    urlFont.setUnderline(true);
 
     // Preallocate maximum expected amount of rows
     // decrese it after if needed
     // TODO: error check
     filledRowCount = ui->mainSitesTable->rowCount();
     ui->mainSitesTable->setRowCount(gotRows + filledRowCount);
-    ui->mainSitesTable->setColumnCount(6);
+    ui->mainSitesTable->setColumnCount(5);
     for (auto it = data.begin(); it != data.end(); ++it)
     {
         GYS::DataItem_Pair siteName = it.key();
@@ -80,37 +86,37 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
         if (targetRow == filledRowCount)
             filledRowCount++;
 
-        ui->mainSitesTable->setItem(targetRow, 0, newItem);
+        newItem->setForeground(QBrush(Qt::blue));
+        newItem->setFont(urlFont);
+        ui->mainSitesTable->setItem(targetRow, 1, newItem);
 
         for (auto it2 = siteRow.begin(); it2 != siteRow.end(); ++it2)
         {
             GYS::DataItem_Pair cell = *it2;
-            int col = 0;
+            int col = -1;
             switch(cell.first)
             {
             case GYS::ItemType::NUM_ID:
-                col = 1;
-                break;
-            case GYS::ItemType::DATE_ADDED:
-                col = 2;
+                col = 0;
                 break;
             case GYS::ItemType::REGION_RANK:
-                col = 3;
+                col = 2;
                 break;
             case GYS::ItemType::WORLD_RANK:
-                col = 4;
+                col = 3;
                 break;
+            case GYS::ItemType::DATE_ADDED:
             case GYS::ItemType::NAME_ID:
             case GYS::ItemType::PARENT_KEY:
             default:
-                qDebug() << "Spurious action!";
+                qDebug() << "Field ignored";
                 break;
             }
 
-            if (col)
+            if (col >= 0) {
                 newItem = new QTableWidgetItem(cell.second);
-
-            ui->mainSitesTable->setItem(targetRow, col, newItem);
+                ui->mainSitesTable->setItem(targetRow, col, newItem);
+            }
         }
     }
     ui->mainSitesTable->setRowCount(filledRowCount);
@@ -140,4 +146,18 @@ void MainWindow::on_btnLoadFile_clicked()
 void MainWindow::on_btnUpdateAll_clicked()
 {
     emit requestUpdateAll();
+}
+
+void MainWindow::on_mainSitesTable_cellClicked(int row, int column)
+{
+    LOG_ENTRY;
+    if (column == 1)
+    {
+        QString name = ui->mainSitesTable->item(row, column)->text();
+        qDebug() << "clicked " << name;
+        QUrl url;
+        url.setScheme("http");
+        url.setHost(name);
+        QDesktopServices::openUrl(url);
+    }
 }
