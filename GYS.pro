@@ -18,13 +18,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     gys_controller.cpp \
     gys_csvfetcher.cpp \
-    gys_storage.cpp
+    gys_storage.cpp \
+    gys_ranks.cpp
 
 HEADERS  += mainwindow.h \
     gys_controller.h \
     gys_types.h \
     gys_csvfetcher.h \
     gys_exceptions.h \
-    gys_storage.h
+    gys_storage.h \
+    gys_ranks.h
 
 FORMS    += mainwindow.ui
