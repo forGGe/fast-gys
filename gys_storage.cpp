@@ -63,6 +63,9 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
     if (!records.size())
         return;
 
+    if (!m_db.transaction())
+        qDebug() << "Transaction fails!";
+
     // TODO: too straitforward
     // TODO: erorr checks
     QVariantList siteIDs;
@@ -150,6 +153,12 @@ void GYS::Storage::resetGetPosition()
     m_row = 0;
 }
 
+void GYS::Storage::flush() noexcept
+{
+    LOG_ENTRY;
+    m_db.commit();
+}
+
 bool GYS::Storage::addRecord(const GYS::DataItem_Pair   &record,
                              const GYS::DataRow_Vec     &data)
 {
@@ -194,6 +203,8 @@ GYS::DataRow_Vec GYS::Storage::getRefers(const GYS::DataItem_Pair &record,
 void GYS::Storage::clearStorage()
 {
     LOG_ENTRY;
+    m_db.commit();
+
     QSqlQuery query(m_db);
     query.prepare("DELETE FROM Sites");
     if (!query.exec())

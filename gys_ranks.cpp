@@ -23,7 +23,7 @@ GYS::Ranks::~Ranks()
 }
 
 
-GYS::DataRow_Vec GYS::Ranks::getRanksData(QString siteName)
+void GYS::Ranks::getRanksData(QString siteName)
 {
     LOG_ENTRY;
     throw GYS::NotImplemented(Q_FUNC_INFO);

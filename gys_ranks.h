@@ -22,7 +22,14 @@ public:
     ~Ranks();
 
     // Gets rank data for given site name
-    GYS::DataRow_Vec getRanksData(QString siteName);
+    void getRanksData(QString siteName);
+
+signals:
+    // Signals when error occurs
+    void errorOccurs(QString err);
+
+    // Signals when ranks is ready
+    void ranksReady(GYS::DataRow_Vec ranks);
 private:
 
 };

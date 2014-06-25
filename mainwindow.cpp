@@ -151,7 +151,7 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
                 break;
             case GYS::ItemType::DATE_ADDED:
             case GYS::ItemType::NAME_ID:
-            case GYS::ItemType::PARENT_KEY:
+            case GYS::ItemType::ASSOC_KEY:
             default:
                 qDebug() << "Field ignored";
                 break;

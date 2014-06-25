@@ -27,9 +27,9 @@ enum class ItemType
     INVALID_TYPE,
 
     /**
-     * Specifies that given item is a parent key for accociated data
+     * Specifies that given item is an associated key for main key defined
      */
-    PARENT_KEY,
+    ASSOC_KEY,
 
     /**
      * Type to represent client id, numerical form

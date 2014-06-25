@@ -7,13 +7,31 @@
 GYS::Controller::Controller(QObject *parent) noexcept
     :QObject(parent)
     ,m_storage()
+    ,m_ranks()
 {
     LOG_ENTRY;
+    QObject::connect(&m_ranks, &GYS::Ranks::errorOccurs,
+                     this, &GYS::Controller::errorSlot);
+
+    QObject::connect(&m_ranks, &GYS::Ranks::ranksReady,
+                     this, &GYS::Controller::consumeData);
 }
 
 GYS::Controller::~Controller() noexcept
 {
     LOG_ENTRY;
+}
+
+void GYS::Controller::consumeData(GYS::DataRow_Vec data)
+{
+    LOG_ENTRY;
+    emit sendError("Data consuming is not implemented");
+}
+
+void GYS::Controller::errorSlot(QString err)
+{
+    LOG_ENTRY;
+    emit sendError(err);
 }
 
 void GYS::Controller::launch() noexcept
@@ -68,10 +86,17 @@ void GYS::Controller::loadFile(QString filePath) noexcept
             if (table.size())
             {
                 m_storage.addRecords(table);
+
                 emit sendSitesData(table);
+
+                // To make sure items are already present inside database
+                // ranks data should be fetched after items was added to database
+                // for (auto it = table.begin(); it != table.end(); ++it)
+                //    m_ranks.getRanksData(it.key());
             }
         }
 
+        m_storage.flush();
         emit fileLoaded();
     }
     catch (GYS::Exception &e)

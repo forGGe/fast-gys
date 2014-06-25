@@ -7,6 +7,7 @@
 
 #include "gys_types.h"
 #include "gys_storage.h"
+#include "gys_ranks.h"
 
 namespace GYS
 {
@@ -109,6 +110,21 @@ signals:
 
 public slots:
     /**
+     * \brief Consumes new data that was added outside of UI
+     *
+     * It will try to update missing data, if such exist
+     *
+     * \param[in] data
+     */
+    void consumeData(GYS::DataRow_Vec data);
+
+    /**
+     * \brief Slot to recieve an error
+     * \param[in] String that describes an error
+     */
+    void errorSlot(QString err);
+
+    /**
      * \brief Notify about program to launch
      *
      */
@@ -124,7 +140,8 @@ public slots:
      */
 
 private:
-    GYS::Storage m_storage;
+    GYS::Storage m_storage; /**< Storage to contain fetched data */
+    GYS::Ranks   m_ranks;   /**< To retrieve ranks */
 };
 
 
