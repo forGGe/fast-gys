@@ -8,6 +8,8 @@
 #ifndef GYS_RANKS_H
 #define GYS_RANKS_H
 
+#include <QtNetwork/QNetworkAccessManager>
+
 #include "gys_types.h"
 
 
@@ -18,7 +20,7 @@ class Ranks : public QObject
 {
     Q_OBJECT
 public:
-    Ranks();
+    Ranks(QObject *parent);
     ~Ranks();
 
     // Gets rank data for given site name
@@ -30,7 +32,14 @@ signals:
 
     // Signals when ranks is ready
     void ranksReady(GYS::DataRow_Vec ranks);
+
+private slots:
+    // To recieve reply from network manager
+    void dataReady(QNetworkReply *reply);
+
 private:
+    // To maintaing requests
+    QNetworkAccessManager *m_mgr;
 
 };
 

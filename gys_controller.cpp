@@ -7,7 +7,7 @@
 GYS::Controller::Controller(QObject *parent) noexcept
     :QObject(parent)
     ,m_storage()
-    ,m_ranks()
+    ,m_ranks(this)
 {
     LOG_ENTRY;
     QObject::connect(&m_ranks, &GYS::Ranks::errorOccurs,
@@ -88,11 +88,6 @@ void GYS::Controller::loadFile(QString filePath) noexcept
                 m_storage.addRecords(table);
 
                 emit sendSitesData(table);
-
-                // To make sure items are already present inside database
-                // ranks data should be fetched after items was added to database
-                // for (auto it = table.begin(); it != table.end(); ++it)
-                //    m_ranks.getRanksData(it.key());
             }
         }
 
@@ -133,7 +128,15 @@ void GYS::Controller::updateRating(QList< QString > sites) noexcept
 void GYS::Controller::updateAll() noexcept
 {
     LOG_ENTRY;
-    emit sendError("Updating not implemented");
+
+    GYS::DataTable_Map items;
+    const quint64 amount = 512;
+
+    while ((items = m_storage.getNextRecords(amount)).size() > 0)
+    {
+        for (auto it = items.begin(); it != items.end(); ++it)
+            m_ranks.getRanksData(it.key().second);
+    }
 }
 
 void GYS::Controller::findSimilar(QList< QString > sites) noexcept
