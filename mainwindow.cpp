@@ -1,4 +1,4 @@
-#include <QFileDialog>
+﻿#include <QFileDialog>
 #include <QMessageBox>
 #include <QVariant>
 #include <QDesktopServices>
@@ -121,8 +121,8 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
         // TODO: use list containing particular name and its row,
         // to quickly find a dublicates
         for (targetRow = 0; targetRow < filledRowCount; ++targetRow)
-            if (ui->mainSitesTable->item(targetRow, 0) == nullptr ||
-                    (ui->mainSitesTable->item(targetRow, 0)->text() == siteName.second))
+            if (ui->mainSitesTable->item(targetRow, 1) == nullptr ||
+                    (ui->mainSitesTable->item(targetRow, 1)->text() == siteName.second))
             {
                 break;
             }
@@ -143,11 +143,14 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
             case GYS::ItemType::NUM_ID:
                 col = 0;
                 break;
-            case GYS::ItemType::REGION_RANK:
+            case GYS::ItemType::WORLD_RANK:
                 col = 2;
                 break;
-            case GYS::ItemType::WORLD_RANK:
+            case GYS::ItemType::REGION_ID:
                 col = 3;
+                break;
+            case GYS::ItemType::REGION_RANK:
+                col = 4;
                 break;
             case GYS::ItemType::DATE_ADDED:
             case GYS::ItemType::NAME_ID:

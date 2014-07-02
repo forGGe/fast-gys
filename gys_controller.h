@@ -1,4 +1,4 @@
-#ifndef GYSCONTROLLER_H
+﻿#ifndef GYSCONTROLLER_H
 #define GYSCONTROLLER_H
 
 #include <QObject>
@@ -116,7 +116,7 @@ public slots:
      *
      * \param[in] data
      */
-    void consumeData(GYS::DataRow_Vec data);
+    void consumeData(GYS::DataTable_Map data);
 
     /**
      * \brief Slot to recieve an error
@@ -141,7 +141,7 @@ public slots:
 
 private:
     GYS::Storage m_storage; /**< Storage to contain fetched data */
-    GYS::Ranks  *m_ranks;   /**< To retrieve ranks */
+    GYS::Ranks   m_ranks;   /**< To retrieve ranks */
 };
 
 

@@ -1,4 +1,4 @@
-#include <QApplication>
+﻿#include <QApplication>
 #include <QThread>
 
 #include "mainwindow.h"
@@ -9,47 +9,47 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MainWindow w;
-    GYS::Controller ctrl;
-    QThread modelThread;
+    GYS::Controller *ctrl = new GYS::Controller;
+    QThread *modelThread = new QThread;
 
     // Registering meta types to make possible use new types in queued connections
     qRegisterMetaType< GYS::DataItem_Pair >();
     qRegisterMetaType< GYS::DataRow_Vec >();
     qRegisterMetaType< GYS::DataTable_Map >();
 
-    ctrl.moveToThread(&modelThread);
+    ctrl->moveToThread(modelThread);
 
     // Setup connections UI -> Controller
     QObject::connect(&w, &MainWindow::exiting,
-                     &ctrl, &GYS::Controller::exit);
+                     ctrl, &GYS::Controller::exit);
     QObject::connect(&w, &MainWindow::requestLoadFile,
-                     &ctrl, &GYS::Controller::loadFile);
+                     ctrl, &GYS::Controller::loadFile);
     QObject::connect(&w, &MainWindow::requestUpdateRating,
-                     &ctrl, &GYS::Controller::updateRating);
+                     ctrl, &GYS::Controller::updateRating);
     QObject::connect(&w, &MainWindow::requestUpdateAll,
-                     &ctrl, &GYS::Controller::updateAll);
+                     ctrl, &GYS::Controller::updateAll);
     QObject::connect(&w, &MainWindow::requestFindSimilar,
-                     &ctrl, &GYS::Controller::findSimilar);
+                     ctrl, &GYS::Controller::findSimilar);
     QObject::connect(&w, &MainWindow::requestUpdateSimilar,
-                     &ctrl, &GYS::Controller::updateSimilar);
+                     ctrl, &GYS::Controller::updateSimilar);
 
     // Setup connections Controller -> UI
-    QObject::connect(&ctrl, &GYS::Controller::launched,
+    QObject::connect(ctrl, &GYS::Controller::launched,
                      &w, &MainWindow::lauchDone);
-    QObject::connect(&ctrl, &GYS::Controller::fileLoaded,
+    QObject::connect(ctrl, &GYS::Controller::fileLoaded,
                      &w, &MainWindow::fileLoadingDone);
-    QObject::connect(&ctrl, &GYS::Controller::sendSitesData,
+    QObject::connect(ctrl, &GYS::Controller::sendSitesData,
                      &w, &MainWindow::recieveSitesData);
-    QObject::connect(&ctrl, &GYS::Controller::sendError,
+    QObject::connect(ctrl, &GYS::Controller::sendError,
                      &w, &MainWindow::errorSlot);
-    QObject::connect(&ctrl, &GYS::Controller::allDataDeleted,
+    QObject::connect(ctrl, &GYS::Controller::allDataDeleted,
                      &w, &MainWindow::clearTable);
 
     // Notify Controller about start
-    QMetaObject::invokeMethod(&ctrl, "launch", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(ctrl, "launch", Qt::QueuedConnection);
 
     w.show();
-    modelThread.start();
+    modelThread->start();
 
     return a.exec();
 }

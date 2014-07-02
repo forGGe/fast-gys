@@ -1,4 +1,4 @@
-/*!
+﻿/*!
  * \file    gys_ranks.cpp
  *
  * \author  Max
@@ -7,13 +7,15 @@
  */
 
 #include <QtNetwork/QNetworkReply>
+#include <QXmlStreamReader>
+#include <QStack>
 
 #include "gys_ranks.h"
 #include "gys_exceptions.h"
 
 GYS::Ranks::Ranks(QObject *parent)
     :QObject(parent)
-    ,m_mgr(parent)
+    ,m_mgr(this)
 {
     LOG_ENTRY;
 
@@ -25,19 +27,138 @@ GYS::Ranks::Ranks(QObject *parent)
 GYS::Ranks::~Ranks()
 {
     LOG_ENTRY;
-
 }
 
 
 void GYS::Ranks::getRanksData(QString siteName)
 {
     LOG_ENTRY;
-    throw GYS::NotImplemented(Q_FUNC_INFO);
+    // TODO: error check
+
+
+    QUrl url;
+    url.setScheme("http");
+    url.setHost("data.alexa.com");
+    url.setPath("/data");
+    url.setQuery(QString("cli=10&dat=snbamz&url=") + siteName);
+    m_mgr.get(QNetworkRequest(url));
 }
 
 
 void GYS::Ranks::dataReady(QNetworkReply *reply)
 {
     LOG_ENTRY;
+    // TODO: erorr check and send
 
+    QXmlStreamReader xml;
+    QStack< QString > stack;
+    QStack< QString > globalRankPath;
+    QStack< QString > regionRankPath;
+    QStack< QString > hostNamePath;
+    bool rankGot = false;
+
+    globalRankPath.push("ALEXA");
+    globalRankPath.push("SD");
+    globalRankPath.push("POPULARITY");
+
+    regionRankPath.push("ALEXA");
+    regionRankPath.push("SD");
+    regionRankPath.push("COUNTRY");
+
+    hostNamePath.push("ALEXA");
+    hostNamePath.push("SD");
+
+    GYS::DataTable_Map data;
+    GYS::DataRow_Vec row;
+    GYS::DataItem_Pair siteName;
+
+    if (reply->error())
+    {
+        qDebug() << "Erorr occurs for url "  << reply->url().toString();
+        qDebug() << reply->errorString();
+        reply->deleteLater();
+        return;
+    }
+
+    xml.setDevice(reply);
+
+    while (!xml.atEnd())
+    {
+        QXmlStreamReader::TokenType type = xml.readNext();
+        switch (type)
+        {
+        case QXmlStreamReader::StartElement:
+            stack.push(xml.name().toString());
+            break;
+        case QXmlStreamReader::EndElement:
+            stack.pop();
+            break;
+        default:
+            break;
+        }
+
+        if (stack == hostNamePath)
+        {
+            if (xml.attributes().size() > 2)
+                qDebug() << "Host found: " << xml.attributes().at(2).value().toString();
+        }
+        else if (stack == globalRankPath)
+        {
+            if (xml.attributes().size() > 1)
+            {
+                GYS::DataItem_Pair rank;
+                QString query;
+                QString param("&url=");
+                int idx;
+
+                QString domain = xml.attributes().at(0).value().toString().remove('/');
+                rank.first = GYS::ItemType::WORLD_RANK;
+                rank.second = xml.attributes().at(1).value().toString();
+                row.push_back(rank);
+
+                qDebug() << "Domain: " + domain + " rank: " + rank.second;
+                rankGot = true;
+
+                // Got site name from URL
+                query = reply->url().query();
+                idx = query.indexOf(param);
+                idx += param.size();
+
+                siteName.first = GYS::ItemType::NAME_ID;
+                // To lower case - to be sure
+                siteName.second = query.mid(idx).toLower();
+            }
+        }
+        else if (stack == regionRankPath)
+        {
+            if (xml.attributes().size() > 2)
+            {
+                GYS::DataItem_Pair localRank;
+                GYS::DataItem_Pair region;
+                localRank.first = GYS::ItemType::REGION_ID;
+                localRank.second = xml.attributes().at(0).value().toString();
+                row.push_back(localRank);
+
+                region.first = GYS::ItemType::REGION_RANK;
+                region.second = xml.attributes().at(2).value().toString();
+                row.push_back(region);
+
+                qDebug() << "Region: " << region.second + " rank: " << localRank.second;
+
+            }
+        }
+
+    }
+
+    if (xml.hasError()) {
+        qDebug() << xml.errorString();
+    }
+
+    if (rankGot)
+    {
+        data.insert(siteName, row);
+        emit ranksReady(data);
+    }
+
+    reply->deleteLater();
 }

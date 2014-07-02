@@ -1,4 +1,4 @@
-/*!
+﻿/*!
  * \file    gys_ranks.cpp
  *
  * \author  Max
@@ -31,7 +31,7 @@ signals:
     void errorOccurs(QString err);
 
     // Signals when ranks is ready
-    void ranksReady(GYS::DataRow_Vec ranks);
+    void ranksReady(GYS::DataTable_Map ranks);
 
 private slots:
     // To recieve reply from network manager
@@ -39,7 +39,7 @@ private slots:
 
 private:
     // To maintaing requests
-    QNetworkAccessManager *m_mgr;
+    QNetworkAccessManager m_mgr;
 
 };
 

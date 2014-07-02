@@ -1,4 +1,4 @@
-#include <QRegularExpression>
+﻿#include <QRegularExpression>
 #include <QRegularExpressionMatch>
 
 #include "gys_exceptions.h"
@@ -147,7 +147,8 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
                 if (nameMatch.hasMatch())
                 {
                     clientID.first = GYS::ItemType::NAME_ID;
-                    clientID.second = nameMatch.captured();
+                    // Only lower case is allowed
+                    clientID.second = nameMatch.captured().toLower();
 
                     GYS::DataRow_Vec rowData =
                     {

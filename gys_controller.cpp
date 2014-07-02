@@ -1,4 +1,4 @@
-#include <QtDebug>
+﻿#include <QtDebug>
 
 #include "gys_controller.h"
 #include "gys_csvfetcher.h"
@@ -22,10 +22,10 @@ GYS::Controller::~Controller() noexcept
     LOG_ENTRY;
 }
 
-void GYS::Controller::consumeData(GYS::DataRow_Vec data)
+void GYS::Controller::consumeData(DataTable_Map data)
 {
     LOG_ENTRY;
-    emit sendError("Data consuming is not implemented");
+    emit sendSitesData(data);
 }
 
 void GYS::Controller::errorSlot(QString err)
@@ -131,6 +131,8 @@ void GYS::Controller::updateAll() noexcept
 
     GYS::DataTable_Map items;
     const quint64 amount = 512;
+
+    m_storage.resetGetPosition();
 
     while ((items = m_storage.getNextRecords(amount)).size() > 0)
     {
