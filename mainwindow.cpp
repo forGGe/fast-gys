@@ -132,6 +132,7 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 
         newItem->setForeground(QBrush(Qt::blue));
         newItem->setFont(urlFont);
+        newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->mainSitesTable->setItem(targetRow, 1, newItem);
 
         for (auto it2 = siteRow.begin(); it2 != siteRow.end(); ++it2)
@@ -162,6 +163,7 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
 
             if (col >= 0) {
                 newItem = new QTableWidgetItem(cell.second);
+                newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
                 ui->mainSitesTable->setItem(targetRow, col, newItem);
             }
         }
