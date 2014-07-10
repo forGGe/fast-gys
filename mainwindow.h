@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -27,13 +27,15 @@ private slots:
     void on_btnUpdateAll_clicked();
     void on_mainSitesTable_cellClicked(int row, int column);
 
+    void on_btnUpdateSelected_clicked();
+
 private:
     Ui::MainWindow *ui;
 
 signals:
     void exiting();
     void requestLoadFile(QString file_name);
-    void requestUpdateRating(QList< QString > sites);
+    void requestUpdateRating(GYS::Sites_List sites);
     void requestUpdateAll();
     void requestFindSimilar(QList< QString > sites);
     void requestUpdateSimilar(QList< QString > sites);

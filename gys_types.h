@@ -77,6 +77,11 @@ using DataRow_Vec    = QVector< GYS::DataItem_Pair >;
  */
 using DataTable_Map  = QMap< GYS::DataItem_Pair, GYS::DataRow_Vec >;
 
+/**
+ * \brief Type used to store site names without any additional data
+ */
+using Sites_List     = QStringList;
+
 }
 
 #define LOG_ENTRY do { qDebug() << "Entered: " << Q_FUNC_INFO; } while(0)
@@ -86,6 +91,7 @@ using DataTable_Map  = QMap< GYS::DataItem_Pair, GYS::DataRow_Vec >;
 Q_DECLARE_METATYPE(GYS::DataItem_Pair)
 Q_DECLARE_METATYPE(GYS::DataRow_Vec)
 Q_DECLARE_METATYPE(GYS::DataTable_Map)
+Q_DECLARE_METATYPE(GYS::Sites_List)
 
 
 #endif // GYSTYPES_H

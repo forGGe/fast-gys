@@ -77,7 +77,7 @@ public slots:
     /**
      * \brief Updates rating of a given site names
      */
-    void updateRating(QList< QString > sites) noexcept;
+    void updateRating(GYS::Sites_List sites) noexcept;
 
     /**
      * \brief Updates all records and finds ranks for it
@@ -89,7 +89,7 @@ public slots:
      *
      * It will load information from cache, if such exist.
      */
-    void findSimilar(QList< QString > sites) noexcept;
+    void findSimilar(GYS::Sites_List sites) noexcept;
 
     /**
      * \brief Updates similar sites for given sites

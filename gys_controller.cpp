@@ -121,10 +121,14 @@ void GYS::Controller::loadFile(QString filePath) noexcept
     // TODO: check and handle errors
 }
 
-void GYS::Controller::updateRating(QList< QString > sites) noexcept
+void GYS::Controller::updateRating(Sites_List sites) noexcept
 {
     LOG_ENTRY;
-    emit sendError("Updating not implemented");
+    //emit sendError("Updating not implemented");
+    for (auto it = sites.begin(); it != sites.end(); ++it)
+    {
+        m_ranks.getRanksData(*it);
+    }
 }
 
 void GYS::Controller::updateAll() noexcept
@@ -143,7 +147,7 @@ void GYS::Controller::updateAll() noexcept
     }
 }
 
-void GYS::Controller::findSimilar(QList< QString > sites) noexcept
+void GYS::Controller::findSimilar(Sites_List sites) noexcept
 {
     LOG_ENTRY;
     emit sendError("Finding not implemented");

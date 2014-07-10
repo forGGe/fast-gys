@@ -25,6 +25,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    LOG_ENTRY;
     if (event == QKeySequence::Copy)
     {
         LOG_STREAM << "Copy event occurs";
@@ -209,4 +210,25 @@ void MainWindow::on_mainSitesTable_cellClicked(int row, int column)
         url.setHost(name);
         QDesktopServices::openUrl(url);
     }
+}
+
+void MainWindow::on_btnUpdateSelected_clicked()
+{
+    LOG_ENTRY;
+    QList< QTableWidgetSelectionRange > ranges = ui->mainSitesTable->selectedRanges();
+    QList< QString > sites;
+
+    for (auto it = ranges.begin(); it != ranges.end(); ++it)
+    {
+        for (int row = it->topRow(); row < it->bottomRow() + 1; row++)
+        {
+            // Mark empty item with whitespace
+            QTableWidgetItem *item = ui->mainSitesTable->item(row, 1);
+            if (item && !item->text().isEmpty())
+                sites.append(item->text());
+        }
+    }
+
+    if (sites.size())
+        emit requestUpdateRating(sites);
 }

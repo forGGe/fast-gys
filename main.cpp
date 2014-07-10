@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType< GYS::DataItem_Pair >();
     qRegisterMetaType< GYS::DataRow_Vec >();
     qRegisterMetaType< GYS::DataTable_Map >();
+    qRegisterMetaType< GYS::Sites_List >("GYS::Sites_List");
 
     ctrl->moveToThread(modelThread);
 
