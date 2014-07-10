@@ -1,6 +1,7 @@
 ﻿#include <QSqlQuery>
 #include <QSqlError>
 #include <QVariantList>
+#include <QDate>
 
 #include "gys_storage.h"
 #include "gys_exceptions.h"
@@ -29,7 +30,8 @@ GYS::Storage::Storage() noexcept
                 "date TEXT, "
                 "rank INTEGER, "
                 "country TEXT, "
-                "local_rank INTEGER"
+                "local_rank INTEGER, "
+                "date_updated TEXT "
                 ");"
                 );
     QSqlQuery query;
@@ -116,9 +118,10 @@ void GYS::Storage::updateRecords(const GYS::DataTable_Map &records)
     QString queryStr = "UPDATE Sites "
                        "SET ";
 
-
     for (auto it1 = records.begin(); it1 != records.end(); ++it1) {
         GYS::DataRow_Vec vec = it1.value();
+
+        bool filled = false;
 
         for (auto it2 = vec.begin(); it2 != vec.end(); ++it2)
         {
@@ -128,28 +131,41 @@ void GYS::Storage::updateRecords(const GYS::DataTable_Map &records)
             {
             case GYS::ItemType::REGION_ID:
                 queryStr += "country=\'" + str + "\',";
+                filled = true;
                 break;
             case GYS::ItemType::REGION_RANK:
                 queryStr += "local_rank=\'" + str + "\',";
+                filled = true;
                 break;
             case GYS::ItemType::WORLD_RANK:
                 queryStr += "rank=\'" + str + "\',";
+                filled = true;
+                break;
+            case GYS::ItemType::DATE_UPDATED:
+                queryStr += "date_updated=\'" + str + "\',";
+                // This shouldn't be threated as useful data to store
+                // in case if there are no other data present
+                break;
             default:
                 break;
             }
         }
 
-        // Remove trailing ','
-        queryStr.chop(1);
-        queryStr += " WHERE name=\'" + it1.key().second + "\';";
-
-        if (!query.exec(queryStr))
+        if (filled)
         {
-            LOG_STREAM << query.lastError().type();
-            LOG_STREAM << query.lastError().text();
-        }
+            // Remove trailing ','
+            queryStr.chop(1);
 
-        query.finish();
+            queryStr += " WHERE name=\'" + it1.key().second + "\';";
+
+            if (!query.exec(queryStr))
+            {
+                LOG_STREAM << query.lastError().type();
+                LOG_STREAM << query.lastError().text();
+            }
+
+            query.finish();
+        }
     }
 
     return;
@@ -166,7 +182,7 @@ GYS::DataTable_Map GYS::Storage::getNextRecords(quint64 amount)
     quint64 got = 0;
     query.setForwardOnly(true);
     query.prepare(
-                "SELECT site_id, name, date, country, local_rank, rank "
+                "SELECT site_id, name, date, country, local_rank, rank, date_updated "
                 "FROM Sites "
                 "LIMIT :amount OFFSET :offset;"
                 );
@@ -194,8 +210,10 @@ GYS::DataTable_Map GYS::Storage::getNextRecords(quint64 amount)
         { GYS::ItemType::REGION_RANK, query.value(4).toString() };
         GYS::DataItem_Pair rank =
         { GYS::ItemType::WORLD_RANK, query.value(5).toString() };
+        GYS::DataItem_Pair dateUpdated =
+        { GYS::ItemType::DATE_UPDATED, query.value(6).toString() };
 
-        GYS::DataRow_Vec row = { site_id, date, country, local_rank, rank };
+        GYS::DataRow_Vec row = { site_id, date, country, local_rank, rank, dateUpdated };
         table.insert(key, row);
         got++;
     }

@@ -136,10 +136,13 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
         newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->mainSitesTable->setItem(targetRow, 1, newItem);
 
+        bool outdated = false;
+
         for (auto it2 = siteRow.begin(); it2 != siteRow.end(); ++it2)
         {
             GYS::DataItem_Pair cell = *it2;
             int col = -1;
+
             switch(cell.first)
             {
             case GYS::ItemType::NUM_ID:
@@ -154,6 +157,15 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
             case GYS::ItemType::REGION_RANK:
                 col = 4;
                 break;
+            case GYS::ItemType::DATE_UPDATED:
+                // Item that was updated one day ago should be marked as outdated
+                if (!cell.second.isEmpty())
+                {
+                    QDate itemTime = QDate::fromString(cell.second);
+                    if (itemTime.addDays(1) <= QDate::currentDate())
+                        outdated = true;
+                }
+                break;
             case GYS::ItemType::DATE_ADDED:
             case GYS::ItemType::NAME_ID:
             case GYS::ItemType::ASSOC_KEY:
@@ -162,10 +174,24 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
                 break;
             }
 
-            if (col >= 0) {
+            if (col >= 0)
+            {
                 newItem = new QTableWidgetItem(cell.second);
                 newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
                 ui->mainSitesTable->setItem(targetRow, col, newItem);
+            }
+        }
+
+        if (outdated)
+        {
+            for (int col = 0; col < ui->mainSitesTable->columnCount(); ++col)
+            {
+                QTableWidgetItem *item = ui->mainSitesTable->item(targetRow, col);
+                if (item)
+                {
+                    // Light-cyan... or something like that
+                    item->setBackgroundColor(QColor(196, 244, 255));
+                }
             }
         }
     }

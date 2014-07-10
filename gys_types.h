@@ -21,45 +21,32 @@ namespace GYS
  */
 enum class ItemType
 {
-    /**
-     * Obvious, to represent invalid type
-     */
+    /** Obvious, to represent invalid type */
     INVALID_TYPE,
 
-    /**
-     * Specifies that given item is an associated key for main key defined
-     */
+    /** Specifies that given item is an associated key for main key defined */
     ASSOC_KEY,
 
-    /**
-     * Type to represent client id, numerical form
-     */
+    /** Type to represent client id, numerical form */
     NUM_ID,
 
-    /**
-     * Type to represent client id, string form (site name actually)
-     */
+    /** Type to represent client id, string form (site name actually) */
     NAME_ID,
 
-    /**
-     * Type to represent date when site was added
-     */
+    /** Type to represent date when site was added */
     DATE_ADDED,
 
-    /**
-     * Type to represent host country of the site
-     */
+    /** Type to represent host country of the site */
     REGION_ID,
 
-    /**
-     * Type to represent world rank of the site
-     */
+    /** Type to represent world rank of the site */
     WORLD_RANK,
 
-    /**
-     * Rank of the site in most popular region
-     */
+    /** Rank of the site in most popular region */
     REGION_RANK,
+
+    /** Last date when rank was updated */
+    DATE_UPDATED,
 };
 
 /**

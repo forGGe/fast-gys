@@ -26,6 +26,14 @@ GYS::Controller::~Controller() noexcept
 void GYS::Controller::consumeData(DataTable_Map data)
 {
     LOG_ENTRY;
+    QString date = QDate::currentDate().toString();
+    GYS::DataItem_Pair dataItem = { GYS::ItemType::DATE_UPDATED, date };
+
+    for (auto it = data.begin(); it != data.end(); ++it)
+    {
+        it.value().push_back(dataItem);
+    }
+
     m_storage.updateRecords(data);
     emit sendSitesData(data);
 }
