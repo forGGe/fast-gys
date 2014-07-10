@@ -1,4 +1,4 @@
-#include <QSqlQuery>
+﻿#include <QSqlQuery>
 #include <QSqlError>
 #include <QVariantList>
 
@@ -19,7 +19,6 @@ GYS::Storage::Storage() noexcept
     m_db.setUserName("user");
     m_db.setPassword("pass");
     ok = m_db.open();
-    qDebug() << ok;
 
     QString createTable(
                 "CREATE TABLE Sites "
@@ -27,22 +26,24 @@ GYS::Storage::Storage() noexcept
                 "site_key INTEGER PRIMARY KEY, "
                 "site_id TEXT, "
                 "name TEXT UNIQUE, "
-                "date TEXT "
-                ") "
+                "date TEXT, "
+                "rank INTEGER, "
+                "country TEXT, "
+                "local_rank INTEGER"
+                ");"
                 );
     QSqlQuery query;
     ok = query.exec(createTable);
-    qDebug() << ok;
 
     if (!ok)
     {
-        qDebug() << query.lastError().type();
-        qDebug() << query.lastError().text();
+        LOG_STREAM << query.lastError().type();
+        LOG_STREAM << query.lastError().text();
     }
 
     while(query.next())
     {
-        qDebug() << query.value(0);
+        LOG_STREAM << query.value(0);
     }
 
     query.finish();
@@ -64,7 +65,7 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
         return;
 
     if (!m_db.transaction())
-        qDebug() << "Transaction fails!";
+       LOG_STREAM << "Transaction fails!";
 
     // TODO: too straitforward
     // TODO: erorr checks
@@ -76,7 +77,7 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
     query.prepare(
                 "INSERT INTO "
                 "Sites (site_id, name, date) "
-                "VALUES (?, ?, ?) "
+                "VALUES (?, ?, ?);"
                 );
     for (auto it = records.begin(); it != records.end(); ++it)
     {
@@ -92,28 +93,82 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
 
     if (!query.execBatch())
     {
-        qDebug() << query.lastError().type();
-        qDebug() << query.lastError().text();
+        LOG_STREAM << query.lastError().type();
+        LOG_STREAM << query.lastError().text();
     }
 
     query.finish();
 }
+
+void GYS::Storage::updateRecords(const GYS::DataTable_Map &records)
+{
+    LOG_ENTRY;
+
+    // Let's not waste any resourses
+    if (!records.size())
+        return;
+
+    // TODO: Enable transaction after some changes in controller
+    // if (!m_db.transaction())
+    //     LOG_STREAM << "Transaction fails!";
+
+    QSqlQuery query(m_db);
+    QString queryStr = "UPDATE Sites "
+                       "SET ";
+
+
+    for (auto it1 = records.begin(); it1 != records.end(); ++it1) {
+        GYS::DataRow_Vec vec = it1.value();
+
+        for (auto it2 = vec.begin(); it2 != vec.end(); ++it2)
+        {
+            QString str = it2->second;
+            GYS::ItemType type = it2->first;
+            switch (type)
+            {
+            case GYS::ItemType::REGION_ID:
+                queryStr += "country=\'" + str + "\',";
+                break;
+            case GYS::ItemType::REGION_RANK:
+                queryStr += "local_rank=\'" + str + "\',";
+                break;
+            case GYS::ItemType::WORLD_RANK:
+                queryStr += "rank=\'" + str + "\',";
+            default:
+                break;
+            }
+        }
+
+        // Remove trailing ','
+        queryStr.chop(1);
+        queryStr += " WHERE name=\'" + it1.key().second + "\';";
+
+        if (!query.exec(queryStr))
+        {
+            LOG_STREAM << query.lastError().type();
+            LOG_STREAM << query.lastError().text();
+        }
+
+        query.finish();
+    }
+
+    return;
+}
+
 
 GYS::DataTable_Map GYS::Storage::getNextRecords(quint64 amount)
 {
     LOG_ENTRY;
 
     // TODO: error checks
-    // TODO: BUG HERE!
-    // It executes and sents not more than 3800 items of overall 3970
     QSqlQuery query(m_db);
     GYS::DataTable_Map table;
     quint64 got = 0;
     query.setForwardOnly(true);
     query.prepare(
-                "SELECT site_id, name, date "
+                "SELECT site_id, name, date, country, local_rank, rank "
                 "FROM Sites "
-                "LIMIT :amount OFFSET :offset "
+                "LIMIT :amount OFFSET :offset;"
                 );
 
     query.bindValue(":amount", amount);
@@ -121,8 +176,8 @@ GYS::DataTable_Map GYS::Storage::getNextRecords(quint64 amount)
 
     if (!query.exec())
     {
-        qDebug() << query.lastError().type();
-        qDebug() << query.lastError().text();
+        LOG_STREAM << query.lastError().type();
+        LOG_STREAM << query.lastError().text();
     }
 
     while (query.next())
@@ -133,8 +188,14 @@ GYS::DataTable_Map GYS::Storage::getNextRecords(quint64 amount)
         { GYS::ItemType::NAME_ID, query.value(1).toString() };
         GYS::DataItem_Pair date =
         { GYS::ItemType::DATE_ADDED, query.value(2).toString() };
+        GYS::DataItem_Pair country =
+        { GYS::ItemType::REGION_ID, query.value(3).toString() };
+        GYS::DataItem_Pair local_rank =
+        { GYS::ItemType::REGION_RANK, query.value(4).toString() };
+        GYS::DataItem_Pair rank =
+        { GYS::ItemType::WORLD_RANK, query.value(5).toString() };
 
-        GYS::DataRow_Vec row = { site_id, date };
+        GYS::DataRow_Vec row = { site_id, date, country, local_rank, rank };
         table.insert(key, row);
         got++;
     }
@@ -209,8 +270,8 @@ void GYS::Storage::clearStorage()
     query.prepare("DELETE FROM Sites");
     if (!query.exec())
     {
-        qDebug() << query.lastError().type();
-        qDebug() << query.lastError().text();
+        LOG_STREAM << query.lastError().type();
+        LOG_STREAM << query.lastError().text();
     }
 }
 

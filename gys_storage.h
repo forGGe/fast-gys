@@ -1,4 +1,4 @@
-#ifndef GYS_STORAGE_H
+﻿#ifndef GYS_STORAGE_H
 #define GYS_STORAGE_H
 
 #include <QObject>
@@ -19,6 +19,10 @@ public:
 
     // Adds records and their data using map key as record key
     void addRecords(const GYS::DataTable_Map &records);
+
+    // Updates records with given info
+    // Records must be present inside storage
+    void updateRecords(const GYS::DataTable_Map &records);
 
     // Gets next bunch of records with given amount
     // It will start reading records from storage start,

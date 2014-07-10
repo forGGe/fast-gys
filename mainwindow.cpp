@@ -27,7 +27,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if (event == QKeySequence::Copy)
     {
-        qDebug() << "Copy event occurs";
+        LOG_STREAM << "Copy event occurs";
         QList< QTableWidgetSelectionRange > ranges = ui->mainSitesTable->selectedRanges();
         for (auto it = ranges.begin(); it != ranges.end(); ++it)
         {
@@ -53,7 +53,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 text += '\n';
             }
 
-            qDebug() << text;
+            LOG_STREAM << text;
 
             clipboard->setText(text);
         }
@@ -81,7 +81,7 @@ void MainWindow::lauchDone()
 void MainWindow::clearTable()
 {
     LOG_ENTRY;
-    qDebug() << ui->mainSitesTable->rowCount();
+    LOG_STREAM << ui->mainSitesTable->rowCount();
     ui->mainSitesTable->setRowCount(0);
 }
 
@@ -156,7 +156,7 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
             case GYS::ItemType::NAME_ID:
             case GYS::ItemType::ASSOC_KEY:
             default:
-                qDebug() << "Field ignored";
+                LOG_STREAM << "Field ignored";
                 break;
             }
 
@@ -201,7 +201,7 @@ void MainWindow::on_mainSitesTable_cellClicked(int row, int column)
     if (column == 1)
     {
         QString name = ui->mainSitesTable->item(row, column)->text();
-        qDebug() << "clicked " << name;
+        LOG_STREAM << "clicked " << name;
         QUrl url;
         url.setScheme("http");
         url.setHost(name);

@@ -1,4 +1,4 @@
-#ifndef GYSTYPES_H
+﻿#ifndef GYSTYPES_H
 #define GYSTYPES_H
 
 #include <QtGlobal>
@@ -49,17 +49,12 @@ enum class ItemType
     /**
      * Type to represent host country of the site
      */
-    HOST_COUNTRY,
+    REGION_ID,
 
     /**
      * Type to represent world rank of the site
      */
     WORLD_RANK,
-
-    /**
-     * Region where given site has most visitors
-     */
-    REGION_ID,
 
     /**
      * Rank of the site in most popular region
@@ -85,6 +80,7 @@ using DataTable_Map  = QMap< GYS::DataItem_Pair, GYS::DataRow_Vec >;
 }
 
 #define LOG_ENTRY do { qDebug() << "Entered: " << Q_FUNC_INFO; } while(0)
+#define LOG_STREAM qDebug()
 
 // Declarations to make possible use new types in queued connections
 Q_DECLARE_METATYPE(GYS::DataItem_Pair)

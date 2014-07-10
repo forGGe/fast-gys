@@ -162,7 +162,7 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
                 }
                 else
                 {
-                    qDebug() << list.at(1) << " is not a site name!";
+                    LOG_STREAM << list.at(1) << " is not a site name!";
                 }
             }
 

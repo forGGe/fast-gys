@@ -14,7 +14,8 @@ GYS::Controller::Controller(QObject *parent) noexcept
                      this, &GYS::Controller::errorSlot);
 
     QObject::connect(&m_ranks, &GYS::Ranks::ranksReady,
-                     this, &GYS::Controller::consumeData);
+                     this, &GYS::Controller::consumeData,
+                     Qt::QueuedConnection);
 }
 
 GYS::Controller::~Controller() noexcept
@@ -25,6 +26,7 @@ GYS::Controller::~Controller() noexcept
 void GYS::Controller::consumeData(DataTable_Map data)
 {
     LOG_ENTRY;
+    m_storage.updateRecords(data);
     emit sendSitesData(data);
 }
 
@@ -98,21 +100,21 @@ void GYS::Controller::loadFile(QString filePath) noexcept
     {
         QString errStr;
         errStr = e.what();
-        qDebug() << "GYS exception raised";
-        qDebug() << errStr;
+        LOG_STREAM << "GYS exception raised";
+        LOG_STREAM << errStr;
         emit sendError(errStr);
     }
     catch (std::exception &e)
     {
         QString errStr;
         errStr = e.what();
-        qDebug() << "STD exception raised";
-        qDebug() << errStr;
+        LOG_STREAM << "STD exception raised";
+        LOG_STREAM << errStr;
         emit sendError(errStr);
     }
     catch (...)
     {
-        qDebug() << "Exception occurs";
+        LOG_STREAM << "Exception occurs";
         emit sendError("Unknown error");
     }
 

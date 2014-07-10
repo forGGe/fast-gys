@@ -35,7 +35,6 @@ void GYS::Ranks::getRanksData(QString siteName)
     LOG_ENTRY;
     // TODO: error check
 
-
     QUrl url;
     url.setScheme("http");
     url.setHost("data.alexa.com");
@@ -74,8 +73,8 @@ void GYS::Ranks::dataReady(QNetworkReply *reply)
 
     if (reply->error())
     {
-        qDebug() << "Erorr occurs for url "  << reply->url().toString();
-        qDebug() << reply->errorString();
+        LOG_STREAM << "Erorr occurs for url "  << reply->url().toString();
+        LOG_STREAM << reply->errorString();
         reply->deleteLater();
         return;
     }
@@ -100,7 +99,7 @@ void GYS::Ranks::dataReady(QNetworkReply *reply)
         if (stack == hostNamePath)
         {
             if (xml.attributes().size() > 2)
-                qDebug() << "Host found: " << xml.attributes().at(2).value().toString();
+                LOG_STREAM << "Host found: " << xml.attributes().at(2).value().toString();
         }
         else if (stack == globalRankPath)
         {
@@ -116,7 +115,7 @@ void GYS::Ranks::dataReady(QNetworkReply *reply)
                 rank.second = xml.attributes().at(1).value().toString();
                 row.push_back(rank);
 
-                qDebug() << "Domain: " + domain + " rank: " + rank.second;
+                LOG_STREAM << "Domain: " + domain + " rank: " + rank.second;
                 rankGot = true;
 
                 // Got site name from URL
@@ -143,7 +142,7 @@ void GYS::Ranks::dataReady(QNetworkReply *reply)
                 region.second = xml.attributes().at(2).value().toString();
                 row.push_back(region);
 
-                qDebug() << "Region: " << region.second + " rank: " << localRank.second;
+                LOG_STREAM << "Region: " << region.second + " rank: " << localRank.second;
 
             }
         }
@@ -151,7 +150,7 @@ void GYS::Ranks::dataReady(QNetworkReply *reply)
     }
 
     if (xml.hasError()) {
-        qDebug() << xml.errorString();
+        LOG_STREAM << xml.errorString();
     }
 
     if (rankGot)
