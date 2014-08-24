@@ -29,6 +29,8 @@ private slots:
 
     void on_btnUpdateSelected_clicked();
 
+    void on_checkBox_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
 

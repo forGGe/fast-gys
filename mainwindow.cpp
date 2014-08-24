@@ -39,19 +39,22 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             QString text;
             for (int row = it->topRow(); row < it->bottomRow() + 1; row++)
             {
-                for (int col = it->leftColumn(); col < it->rightColumn() + 1; col++)
+                // Make sure row isn't hidden
+                if (!ui->mainSitesTable->isRowHidden(row))
                 {
-                    // Mark empty item with whitespace
-                    QTableWidgetItem *item = ui->mainSitesTable->item(row, col);
-                    if (item)
-                        text += item->text();
-                    else
-                        text += " ";
+                    for (int col = it->leftColumn(); col < it->rightColumn() + 1; col++)
+                    {
+                        // Mark empty item with whitespace
+                        QTableWidgetItem *item = ui->mainSitesTable->item(row, col);
+                        if (item)
+                            text += item->text();
+                        else
+                            text += " ";
 
-                    text += '\t';
+                        text += '\t';
+                    }
+                    text += '\n';
                 }
-
-                text += '\n';
             }
 
             LOG_STREAM << text;
@@ -111,7 +114,7 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
     // TODO: error check
     filledRowCount = ui->mainSitesTable->rowCount();
     ui->mainSitesTable->setRowCount(gotRows + filledRowCount);
-    ui->mainSitesTable->setColumnCount(5);
+    ui->mainSitesTable->setColumnCount(6);
     for (auto it = data.begin(); it != data.end(); ++it)
     {
         GYS::DataItem_Pair siteName = it.key();
@@ -167,6 +170,8 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
                 }
                 break;
             case GYS::ItemType::DATE_ADDED:
+                col = 5;
+                break;
             case GYS::ItemType::NAME_ID:
             case GYS::ItemType::ASSOC_KEY:
             default:
@@ -257,4 +262,56 @@ void MainWindow::on_btnUpdateSelected_clicked()
 
     if (sites.size())
         emit requestUpdateRating(sites);
+}
+
+void MainWindow::on_checkBox_stateChanged(int arg1)
+{
+    LOG_ENTRY;
+
+    int rowCount = ui->mainSitesTable->rowCount();
+
+    if (arg1) // Checked
+    {
+        QDateTime hiTime; // Highest time
+        QDateTime tmpTime;
+
+        // Find the latest time of items in the table
+        for (int row = 0; row < rowCount; ++row)
+        {
+            QTableWidgetItem *item = ui->mainSitesTable->item(row, 5);
+            if (item)
+            {
+                tmpTime = QDateTime::fromString(item->text());
+
+                if (tmpTime > hiTime)
+                    hiTime = tmpTime;
+            }
+        }
+
+        // Now, hide needed rows
+        for (int row = 0; row < rowCount; ++row)
+        {
+            QTableWidgetItem *item = ui->mainSitesTable->item(row, 5);
+            if (item)
+            {
+                tmpTime = QDateTime::fromString(item->text());
+                if (tmpTime < hiTime)
+                {
+                    ui->mainSitesTable->hideRow(row);
+                }
+            }
+        }
+
+        LOG_STREAM << "hiTime " << hiTime.toString();
+    }
+    else
+    {
+        // Show all rows
+        for (int row = 0; row < rowCount; ++row)
+        {
+            if (ui->mainSitesTable->isRowHidden(row))
+                ui->mainSitesTable->showRow(row);
+        }
+
+    }
 }

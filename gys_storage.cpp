@@ -77,7 +77,7 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
 
     QSqlQuery query(m_db);
     query.prepare(
-                "INSERT INTO "
+                "INSERT OR IGNORE INTO "
                 "Sites (site_id, name, date) "
                 "VALUES (?, ?, ?);"
                 );

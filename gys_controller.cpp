@@ -79,29 +79,46 @@ void GYS::Controller::loadFile(QString filePath) noexcept
     {
         GYS::CSVFetcher     fetcher;
         GYS::DataTable_Map  table;
+        GYS::DataItem_Pair  curTime;
         quint32     rows;
-        const int   rowsPerSend = 32; // Amount of rows to send in one chunk
+        const uint  rowsPerRead = 64; // Amount of rows to get
+        const uint  rowsPerSend = 512;
         quint32     iters; // Iterations needed to send all file data
+        QString     time;
+
+        time = QDateTime::currentDateTime().toString();
+        curTime = { GYS::ItemType::DATE_ADDED, time };
 
         fetcher.setFile(filePath);
 
         rows = fetcher.getRowsCount();
-        iters = rows / rowsPerSend + 1;
-        m_storage.clearStorage();
-        emit allDataDeleted();
+        iters = rows / rowsPerRead + 1;
+        //m_storage.clearStorage();
+        //emit allDataDeleted();
 
         for (quint32 i = 0; i < iters; i++)
         {
-            table = fetcher.getData(rowsPerSend);
+            table = fetcher.getData(rowsPerRead);
             if (table.size())
             {
-                m_storage.addRecords(table);
+                // Append records with time of file loading
+                for (auto it = table.begin(); it != table.end(); ++it)
+                {
+                    it->append(curTime);
+                }
 
-                emit sendSitesData(table);
+                // Storage will filter records up to its logic
+                m_storage.addRecords(table);
             }
         }
 
         m_storage.flush();
+        table.clear();
+
+        // Send filtered data from the storage to view
+        while ((table = m_storage.getNextRecords(rowsPerSend)).size() > 0)
+            emit sendSitesData(table);
+
         emit fileLoaded();
     }
     catch (GYS::Exception &e)

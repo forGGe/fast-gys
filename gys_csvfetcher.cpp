@@ -155,7 +155,7 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
                         { GYS::ItemType::NUM_ID, list.at(0) },
                         // TODO: For now it doesn't needed
                         // should be removed
-                        { GYS::ItemType::DATE_ADDED, list.at(2) },
+                        // { GYS::ItemType::DATE_ADDED, list.at(2) },
                     };
 
                     table.insert(clientID, rowData);
