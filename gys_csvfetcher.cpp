@@ -141,7 +141,7 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 
             if (!list.at(1).isEmpty())
             {
-                QRegularExpression nameRegx("^[\\w-]+(\\.[\\w-]+)+$");
+                QRegularExpression nameRegx("^(([\\w-]+)\\.)+[a-zA-Z]{2,3}$");
                 QRegularExpressionMatch nameMatch = nameRegx.match(list.at(1));
 
                 if (nameMatch.hasMatch())
