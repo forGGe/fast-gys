@@ -1,10 +1,10 @@
-﻿#ifndef MAINWINDOW_H
+#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
 
-#include "gys_controller.h"
-#include "gys_types.h"
+#include "controller.h"
+#include "types.h"
 
 namespace Ui {
 class MainWindow;

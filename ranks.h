@@ -1,5 +1,5 @@
-﻿/*!
- * \file    gys_ranks.cpp
+/*!
+ * \file    ranks.cpp
  *
  * \author  Max
  * \date    6/24/2014
@@ -10,7 +10,7 @@
 
 #include <QtNetwork/QNetworkAccessManager>
 
-#include "gys_types.h"
+#include "types.h"
 
 
 namespace GYS

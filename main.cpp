@@ -1,8 +1,8 @@
-﻿#include <QApplication>
+#include <QApplication>
 #include <QThread>
 
 #include "mainwindow.h"
-#include "gys_controller.h"
+#include "controller.h"
 
 int main(int argc, char *argv[])
 {
