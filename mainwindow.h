@@ -31,6 +31,8 @@ private slots:
 
     void on_checkBox_stateChanged(int arg1);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -41,6 +43,7 @@ signals:
     void requestUpdateAll();
     void requestFindSimilar(QList< QString > sites);
     void requestUpdateSimilar(QList< QString > sites);
+    void requestDeleteAllFromDataBase();
 
 public slots:
     void lauchDone();

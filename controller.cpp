@@ -93,8 +93,6 @@ void GYS::Controller::loadFile(QString filePath)
 
         rows = fetcher.getRowsCount();
         iters = rows / rowsPerRead + 1;
-        //m_storage.clearStorage();
-        //emit allDataDeleted();
 
         for (quint32 i = 0; i < iters; i++)
         {
@@ -183,4 +181,19 @@ void GYS::Controller::updateSimilar(QList< QString > sites)
     LOG_ENTRY;
     emit sendError("Updating not implemented");
 
+}
+
+void GYS::Controller::deleteAllFromDataBase() noexcept
+{
+    LOG_ENTRY;
+    try
+    {
+        m_storage.clearStorage();
+    }
+    catch(...)
+    {
+        emit sendError("Delete operation has failed");
+    }
+
+    emit allDataDeleted();
 }
