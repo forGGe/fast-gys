@@ -1,4 +1,4 @@
-﻿#include <QFileDialog>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QVariant>
 #include <QDesktopServices>

@@ -1,5 +1,5 @@
-﻿/*!
- * \file    gys_ranks.cpp
+/*!
+ * \file    ranks.cpp
  *
  * \author  Max
  * \date    6/24/2014
@@ -10,8 +10,8 @@
 #include <QXmlStreamReader>
 #include <QStack>
 
-#include "gys_ranks.h"
-#include "gys_exceptions.h"
+#include "ranks.h"
+#include "exceptions.h"
 
 GYS::Ranks::Ranks(QObject *parent)
     :QObject(parent)

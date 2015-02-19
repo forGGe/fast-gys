@@ -16,17 +16,17 @@ CONFIG += c++11 console
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    gys_controller.cpp \
-    gys_csvfetcher.cpp \
-    gys_storage.cpp \
-    gys_ranks.cpp
+    csvfetcher.cpp \
+    storage.cpp \
+    ranks.cpp \
+    controller.cpp
 
 HEADERS  += mainwindow.h \
-    gys_controller.h \
-    gys_types.h \
-    gys_csvfetcher.h \
-    gys_exceptions.h \
-    gys_storage.h \
-    gys_ranks.h
+    controller.h \
+    types.h \
+    csvfetcher.h \
+    exceptions.h \
+    storage.h \
+    ranks.h
 
 FORMS    += mainwindow.ui
