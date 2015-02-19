@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
                      ctrl, &GYS::Controller::findSimilar);
     QObject::connect(&w, &MainWindow::requestUpdateSimilar,
                      ctrl, &GYS::Controller::updateSimilar);
+    QObject::connect(&w, &MainWindow::requestDeleteAllFromDataBase,
+                     ctrl, &GYS::Controller::deleteAllFromDataBase);
 
     // Setup connections Controller -> UI
     QObject::connect(ctrl, &GYS::Controller::launched,
