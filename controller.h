@@ -136,10 +136,10 @@ public slots:
     void exit() noexcept;
 
     /**
-     * @brief Deleting all from Data Base and table
+     * \brief Deleting all from Data Base and table
      */
-    void deleteAllFromDataBase() noexcept;
-    // Fender trying to be a C++ programmer
+    void deleteAllFromDatabase() noexcept;
+
 
 private:
     GYS::Storage m_storage; /**< Storage to contain fetched data */

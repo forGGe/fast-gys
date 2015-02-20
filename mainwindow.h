@@ -43,7 +43,7 @@ signals:
     void requestUpdateAll();
     void requestFindSimilar(QList< QString > sites);
     void requestUpdateSimilar(QList< QString > sites);
-    void requestDeleteAllFromDataBase();
+    void requestDeleteAllFromDatabase();
 
 public slots:
     void lauchDone();

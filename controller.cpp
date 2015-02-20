@@ -183,17 +183,16 @@ void GYS::Controller::updateSimilar(QList< QString > sites) noexcept
 
 }
 
-void GYS::Controller::deleteAllFromDataBase() noexcept
+void GYS::Controller::deleteAllFromDatabase() noexcept
 {
     LOG_ENTRY;
     try
     {
         m_storage.clearStorage();
+        emit allDataDeleted();
     }
     catch(...)
     {
         emit sendError("Delete operation has failed");
     }
-
-    emit allDataDeleted();
 }
