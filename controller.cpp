@@ -183,7 +183,7 @@ void GYS::Controller::updateSimilar(QList< QString > sites)
 
 }
 
-void GYS::Controller::deleteAllFromDatabase() noexcept
+void GYS::Controller::deleteAllFromDatabase()
 {
     LOG_ENTRY;
     try

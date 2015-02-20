@@ -85,8 +85,10 @@ void MainWindow::lauchDone()
 void MainWindow::clearTable()
 {
     LOG_ENTRY;
-    LOG_STREAM << ui->mainSitesTable->rowCount();
+    QMessageBox msgBox;
     ui->mainSitesTable->setRowCount(0);
+    msgBox.setText("Data has been removed!");
+    msgBox.exec();
 }
 
 void MainWindow::fileLoadingDone()

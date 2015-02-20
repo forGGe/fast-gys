@@ -138,9 +138,11 @@ public slots:
     /**
      * \brief Deleting all from Data Base and table
      */
-    void deleteAllFromDatabase() noexcept;
+    void deleteAllFromDatabase();
 
-
+    /**
+     * }@
+     */
 private:
     GYS::Storage m_storage; /**< Storage to contain fetched data */
     GYS::Ranks   m_ranks;   /**< To retrieve ranks */
