@@ -14,7 +14,7 @@ GYS::CSVFetcher::CSVFetcher()
 {
 }
 
-GYS::CSVFetcher::~CSVFetcher() noexcept
+GYS::CSVFetcher::~CSVFetcher()
 {
     LOG_ENTRY;
     m_in.flush();
@@ -61,21 +61,21 @@ void GYS::CSVFetcher::setFile(const QString &filePath)
             if (tmp.isNull())
             {
                 err = QString("Reading failed in row: ")
-                      + QString::number(rows);
+                        + QString::number(rows);
                 throw GYS::Exception(err);
             }
             if (tmp.length() == RowLength)
             {
                 err = QString("File contain too long record in row: ")
-                      + QString::number(rows);
+                        + QString::number(rows);
                 throw GYS::Exception(err);
             }
             if ((count = tmp.count(QRegExp("\"[^\\s]"))) != valuesCount)
             {
                 err = QString("Row contains invalid values count. "
                               "Expected: ") + QString::number(valuesCount) +
-                      QString("Got: ") + QString::number(count) +
-                      QString(" Row num: ") + QString::number(rows);
+                        QString("Got: ") + QString::number(count) +
+                        QString(" Row num: ") + QString::number(rows);
                 throw GYS::Exception(err);
             }
             if (!headerSize)

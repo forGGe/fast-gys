@@ -25,12 +25,12 @@ public:
     /**
      * \brief The constructor
      */
-    explicit Controller(QObject *parent = 0) noexcept;
+    explicit Controller(QObject *parent = 0);
 
     /**
      * \brief The destructor
      */
-    ~Controller() noexcept;
+    ~Controller();
 
     /**
      * \defgroup UIConnectivity Connection between UI and Controller
@@ -72,31 +72,31 @@ public slots:
     /**
      * \brief Loads a file with a given filename
      */
-    void loadFile(QString filePath) noexcept;
+    void loadFile(QString filePath);
 
     /**
      * \brief Updates rating of a given site names
      */
-    void updateRating(GYS::Sites_List sites) noexcept;
+    void updateRating(GYS::Sites_List sites);
 
     /**
      * \brief Updates all records and finds ranks for it
      */
-    void updateAll() noexcept;
+    void updateAll();
 
     /**
      * \brief Founds similar sites for given sites
      *
      * It will load information from cache, if such exist.
      */
-    void findSimilar(GYS::Sites_List sites) noexcept;
+    void findSimilar(GYS::Sites_List sites);
 
     /**
      * \brief Updates similar sites for given sites
      *
      * It will update cache with newest information.
      */
-    void updateSimilar(QList< QString > sites) noexcept;
+    void updateSimilar(QList< QString > sites);
 
     /**
      * }@
@@ -128,19 +128,22 @@ public slots:
      * \brief Notify about program to launch
      *
      */
-    void launch() noexcept;
+    void launch();
 
     /**
      * \brief Notify about program to exit
      */
-    void exit() noexcept;
+    void exit();
 
     /**
      * \brief Deleting all from Data Base and table
      */
-    void deleteAllFromDatabase() noexcept;
+    void deleteAllFromDatabase();
 
 
+    /**
+     * }@
+     */
 private:
     GYS::Storage m_storage; /**< Storage to contain fetched data */
     GYS::Ranks   m_ranks;   /**< To retrieve ranks */

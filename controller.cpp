@@ -4,7 +4,7 @@
 #include "csvfetcher.h"
 #include "exceptions.h"
 
-GYS::Controller::Controller(QObject *parent) noexcept
+GYS::Controller::Controller(QObject *parent)
     :QObject(parent)
     ,m_storage()
     ,m_ranks(this)
@@ -18,7 +18,7 @@ GYS::Controller::Controller(QObject *parent) noexcept
                      Qt::QueuedConnection);
 }
 
-GYS::Controller::~Controller() noexcept
+GYS::Controller::~Controller()
 {
     LOG_ENTRY;
 }
@@ -44,7 +44,7 @@ void GYS::Controller::errorSlot(QString err)
     emit sendError(err);
 }
 
-void GYS::Controller::launch() noexcept
+void GYS::Controller::launch()
 {
     // TODO: improve error checks
     LOG_ENTRY;
@@ -66,13 +66,13 @@ void GYS::Controller::launch() noexcept
     }
 }
 
-void GYS::Controller::exit() noexcept
+void GYS::Controller::exit()
 {
     LOG_ENTRY;
     emit sendError("Exit preparation not implemented");
 }
 
-void GYS::Controller::loadFile(QString filePath) noexcept
+void GYS::Controller::loadFile(QString filePath)
 {
     LOG_ENTRY;
     try
@@ -144,7 +144,7 @@ void GYS::Controller::loadFile(QString filePath) noexcept
     // TODO: check and handle errors
 }
 
-void GYS::Controller::updateRating(Sites_List sites) noexcept
+void GYS::Controller::updateRating(Sites_List sites)
 {
     LOG_ENTRY;
     //emit sendError("Updating not implemented");
@@ -154,7 +154,7 @@ void GYS::Controller::updateRating(Sites_List sites) noexcept
     }
 }
 
-void GYS::Controller::updateAll() noexcept
+void GYS::Controller::updateAll()
 {
     LOG_ENTRY;
 
@@ -170,20 +170,20 @@ void GYS::Controller::updateAll() noexcept
     }
 }
 
-void GYS::Controller::findSimilar(Sites_List sites) noexcept
+void GYS::Controller::findSimilar(Sites_List sites)
 {
     LOG_ENTRY;
     emit sendError("Finding not implemented");
 }
 
-void GYS::Controller::updateSimilar(QList< QString > sites) noexcept
+void GYS::Controller::updateSimilar(QList< QString > sites)
 {
     LOG_ENTRY;
     emit sendError("Updating not implemented");
 
 }
 
-void GYS::Controller::deleteAllFromDatabase() noexcept
+void GYS::Controller::deleteAllFromDatabase()
 {
     LOG_ENTRY;
     try

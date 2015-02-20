@@ -85,8 +85,10 @@ void MainWindow::lauchDone()
 void MainWindow::clearTable()
 {
     LOG_ENTRY;
-    LOG_STREAM << ui->mainSitesTable->rowCount();
+    QMessageBox msgBox;
     ui->mainSitesTable->setRowCount(0);
+    msgBox.setText("Data has been removed!");
+    msgBox.exec();
 }
 
 void MainWindow::fileLoadingDone()
@@ -125,11 +127,13 @@ void MainWindow::recieveSitesData(GYS::DataTable_Map data)
         // TODO: use list containing particular name and its row,
         // to quickly find a dublicates
         for (targetRow = 0; targetRow < filledRowCount; ++targetRow)
+        {
             if (ui->mainSitesTable->item(targetRow, 1) == nullptr ||
                     (ui->mainSitesTable->item(targetRow, 1)->text() == siteName.second))
             {
                 break;
             }
+        }
 
         if (targetRow == filledRowCount)
             filledRowCount++;
@@ -267,7 +271,6 @@ void MainWindow::on_btnUpdateSelected_clicked()
 void MainWindow::on_checkBox_stateChanged(int arg1)
 {
     LOG_ENTRY;
-
     int rowCount = ui->mainSitesTable->rowCount();
 
     if (arg1) // Checked

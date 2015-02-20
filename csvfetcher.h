@@ -18,7 +18,7 @@ class CSVFetcher
 {
 public:
     CSVFetcher();
-    ~CSVFetcher() noexcept;
+    ~CSVFetcher();
 
     /**
      * \brief Sets file to operate on
