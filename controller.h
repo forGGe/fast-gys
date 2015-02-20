@@ -140,6 +140,7 @@ public slots:
      */
     void deleteAllFromDatabase();
 
+
     /**
      * }@
      */
