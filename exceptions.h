@@ -18,7 +18,7 @@ public:
 
     }
 
-    virtual QString what() const noexcept
+    virtual QString what() const
     {
         return m_str;
     }

@@ -7,7 +7,7 @@
 #include "exceptions.h"
 
 
-GYS::Storage::Storage() noexcept
+GYS::Storage::Storage()
     :m_db(QSqlDatabase::addDatabase("QSQLITE"))
     ,m_row(0)
 {
@@ -67,7 +67,7 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
         return;
 
     if (!m_db.transaction())
-       LOG_STREAM << "Transaction fails!";
+        LOG_STREAM << "Transaction fails!";
 
     // TODO: too straitforward
     // TODO: erorr checks
@@ -232,7 +232,7 @@ void GYS::Storage::resetGetPosition()
     m_row = 0;
 }
 
-void GYS::Storage::flush() noexcept
+void GYS::Storage::flush()
 {
     LOG_ENTRY;
     m_db.commit();

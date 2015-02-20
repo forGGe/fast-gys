@@ -14,7 +14,7 @@ namespace GYS
 class Storage
 {
 public:
-    Storage() noexcept;
+    Storage();
     ~Storage();
 
     // Adds records and their data using map key as record key
@@ -35,7 +35,7 @@ public:
     void resetGetPosition();
 
     // Flushes all caches into disk storage
-    void flush() noexcept;
+    void flush();
 
     // Adds record and extends missing data if it was previously created
     // return true if record already existed
