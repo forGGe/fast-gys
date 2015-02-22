@@ -6,7 +6,6 @@
 
 GYS::Controller::Controller(QObject *parent)
     :QObject(parent)
-    ,m_storage()
     ,m_ranks(this)
 {
     LOG_ENTRY;
@@ -34,7 +33,6 @@ void GYS::Controller::consumeData(DataTable_Map data)
         it.value().push_back(dataItem);
     }
 
-    m_storage.updateRecords(data);
     emit sendSitesData(data);
 }
 
@@ -53,10 +51,6 @@ void GYS::Controller::launch()
     {
         GYS::DataTable_Map toSend;
         const quint64 amount = 1024;
-        m_storage.resetGetPosition();
-
-        while ((toSend = m_storage.getNextRecords(amount)).size() > 0)
-            emit sendSitesData(toSend);
 
         emit launched();
     }
@@ -106,16 +100,12 @@ void GYS::Controller::loadFile(QString filePath)
                 }
 
                 // Storage will filter records up to its logic
-                m_storage.addRecords(table);
             }
         }
 
-        m_storage.flush();
         table.clear();
 
         // Send filtered data from the storage to view
-        while ((table = m_storage.getNextRecords(rowsPerSend)).size() > 0)
-            emit sendSitesData(table);
 
         emit fileLoaded();
     }
@@ -160,14 +150,6 @@ void GYS::Controller::updateAll()
 
     GYS::DataTable_Map items;
     const quint64 amount = 512;
-
-    m_storage.resetGetPosition();
-
-    while ((items = m_storage.getNextRecords(amount)).size() > 0)
-    {
-        for (auto it = items.begin(); it != items.end(); ++it)
-            m_ranks.getRanksData(it.key().second);
-    }
 }
 
 void GYS::Controller::findSimilar(Sites_List sites)
@@ -188,7 +170,6 @@ void GYS::Controller::deleteAllFromDatabase()
     LOG_ENTRY;
     try
     {
-        m_storage.clearStorage();
         emit allDataDeleted();
     }
     catch(...)

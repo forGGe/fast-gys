@@ -6,7 +6,6 @@
 #include <QMap>
 
 #include "types.h"
-#include "storage.h"
 #include "ranks.h"
 
 namespace GYS
@@ -145,7 +144,6 @@ public slots:
      * }@
      */
 private:
-    GYS::Storage m_storage; /**< Storage to contain fetched data */
     GYS::Ranks   m_ranks;   /**< To retrieve ranks */
 };
 

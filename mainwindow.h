@@ -10,6 +10,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class QAbstractItemModel;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -17,6 +19,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    void setModel(QAbstractItemModel *model);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event);
