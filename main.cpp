@@ -1,12 +1,13 @@
 #include <QApplication>
-#include "mainclass.h"
+#include <QSqlField>
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    MainClass *mc = new MainClass;
-    mc->setParent(&a);
+    MainWindow mw;
+    mw.show();
 
     return a.exec();
 }

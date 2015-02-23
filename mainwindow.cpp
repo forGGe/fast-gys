@@ -7,6 +7,7 @@
 #include <QClipboard>
 
 #include <QSqlTableModel>
+#include <QSqlField>
 
 
 #include "mainwindow.h"
@@ -14,27 +15,45 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_main(new MainClass(this))
 {
     LOG_ENTRY;
     ui->setupUi(this);
+    m_main->setupView(ui->tableView);
+
+    // Example code, creating\updating item in database
+    // {{
+    QSqlField site_key("site_key", QVariant::Int);
+    QSqlField site_id("site_id", QVariant::String);
+    QSqlField name("name", QVariant::String);
+    QSqlField country("country", QVariant::String);
+    QSqlField rank("rank", QVariant::Int);
+
+    QSqlRecord rec;
+
+    rec.append(site_key);
+    rec.append(site_id);
+    rec.append(name);
+    rec.append(country);
+    rec.append(rank);
+
+    // TODO: do something with these magic strings
+    rec.setValue("site_key", 10109);
+    rec.setValue("site_id", "hello212com.id");
+    rec.setValue("name", "hellmore.com");
+    rec.setValue("country", "UA");
+    rec.setValue("rank", 12);
+
+    m_main->newData(rec);
+    // }}
+    // EOF example
 }
 
 MainWindow::~MainWindow()
 {
     LOG_ENTRY;
     delete ui;
-}
-
-void MainWindow::setModel(QAbstractItemModel *model)
-{
-    ui->tableView->setModel(model);
-}
-
-void MainWindow::keyPressEvent(QKeyEvent *event)
-{
-    LOG_ENTRY;
-    event->ignore();
 }
 
 void MainWindow::on_btnExit_clicked()
@@ -47,29 +66,26 @@ void MainWindow::lauchDone()
     LOG_ENTRY;
 }
 
-void MainWindow::clearTable()
-{
-    LOG_ENTRY;
-}
-
 void MainWindow::fileLoadingDone()
 {
     LOG_ENTRY;
 }
 
-void MainWindow::recieveSitesData(GYS::DataTable_Map data)
+void MainWindow::displayError(QString descr)
 {
     LOG_ENTRY;
 }
 
-void MainWindow::errorSlot(QString descr)
-{
-    LOG_ENTRY;
-}
-
+// TODO: highest priority
 void MainWindow::on_btnLoadFile_clicked()
 {
     LOG_ENTRY;
+    QString filePath = QFileDialog::getOpenFileName(this,
+                                                    "Open CSV",
+                                                    ".",
+                                                    "Comma separated value (*.csv)");
+
+    emit requestLoadFile(filePath);
 }
 
 void MainWindow::on_btnUpdateAll_clicked()

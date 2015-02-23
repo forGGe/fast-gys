@@ -3,9 +3,12 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QSqlRecord>
 
 class MainWindow;
-class QAbstractItemModel;
+class QSqlTableModel;
+class QAbstractItemView;
+
 
 class MainClass : public QObject
 {
@@ -14,10 +17,18 @@ public:
     MainClass(QObject *parent = nullptr);
     ~MainClass();
 
+    void setupView(QAbstractItemView *view);
+
+private:
+    void setupDatabase();
+
 private:
     QSqlDatabase        m_db;
-    QAbstractItemModel  *m_model;
-    MainWindow          *m_w;
+    QSqlTableModel      *m_model;
+
+public slots:
+    void newData(const QSqlRecord record);
+    void updateData(const QSqlRecord record);
 };
 
 
