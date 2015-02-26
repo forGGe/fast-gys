@@ -86,7 +86,7 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
     for (auto it = records.begin(); it != records.end(); ++it)
     {
         siteNames << it.key().second;
-        GYS::DataRow_Vec row = it.value();
+        const GYS::DataRow_Vec &row = it.value();
 
         siteIDs << gag;
         dates << gag;
@@ -96,7 +96,7 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
                 QVariant &tmp = siteIDs.last();
                 tmp = it2->second;
             }
-            if (it2->first == GYS::ItemType::DATE_ADDED)  {
+            else if (it2->first == GYS::ItemType::DATE_ADDED)  {
                 QVariant &tmp = dates.last();
                 tmp = it2->second;
             }
