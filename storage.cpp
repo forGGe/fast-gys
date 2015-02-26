@@ -81,12 +81,26 @@ void GYS::Storage::addRecords(const GYS::DataTable_Map &records)
                 "Sites (site_id, name, date) "
                 "VALUES (?, ?, ?);"
                 );
+
+    QString gag = "   ";
     for (auto it = records.begin(); it != records.end(); ++it)
     {
-        GYS::DataRow_Vec row = it.value();
-        siteIDs << row.at(0).second;
-        dates << row.at(1).second;
         siteNames << it.key().second;
+        const GYS::DataRow_Vec &row = it.value();
+
+        siteIDs << gag;
+        dates << gag;
+        for (auto it2 = row.begin(); it2 != row.end(); ++it2)
+        {
+            if (it2->first == GYS::ItemType::NUM_ID)  {
+                QVariant &tmp = siteIDs.last();
+                tmp = it2->second;
+            }
+            else if (it2->first == GYS::ItemType::DATE_ADDED)  {
+                QVariant &tmp = dates.last();
+                tmp = it2->second;
+            }
+        }
     }
 
     query.addBindValue(siteIDs);
