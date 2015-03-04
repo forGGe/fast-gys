@@ -23,49 +23,49 @@ GYS::CSVFetcher::~CSVFetcher()
 void GYS::CSVFetcher::setFile(const QString &filePath)
 {
     LOG_ENTRY;
-        const int RowLength = 1024;  // Really, why file will contain
-        // entries larger than this?
-        quint64   rows = 0;          // Total amount of rows
-        QString   tmp;               // Temporary string
-        QString   err;               // Contains string describing error
+    const int RowLength = 1024;  // Really, why file will contain
+    // entries larger than this?
+    quint64   rows = 0;          // Total amount of rows
+    QString   tmp;               // Temporary string
+    QString   err;               // Contains string describing error
 
 
-        if (filePath.isEmpty())
-            throw GYS::Exception("File path is invalid");
+    if (filePath.isEmpty())
+        throw GYS::Exception("File path is invalid");
 
-        // Close old one here
-        m_in.flush();
-        if (m_csvFile.isOpen())
-            m_csvFile.close();
+    // Close old one here
+    m_in.flush();
+    if (m_csvFile.isOpen())
+        m_csvFile.close();
 
-        m_csvFile.setFileName(filePath);
-        if (!m_csvFile.open(QIODevice::ReadOnly))
-        {
-            err = QString("Erorr during opening: ") + m_csvFile.errorString();
+    m_csvFile.setFileName(filePath);
+    if (!m_csvFile.open(QIODevice::ReadOnly))
+    {
+        err = QString("Erorr during opening: ") + m_csvFile.errorString();
+        throw GYS::Exception(err);
+    }
+
+    // Figure out how may rows are present
+    m_in.setDevice(&m_csvFile);
+
+    while(!m_in.atEnd())
+    {
+        tmp = m_in.readLine(RowLength);
+        if(tmp.isNull())    {
+            err = QString("Reading failed in row: ")
+                    + QString::number(rows);
             throw GYS::Exception(err);
         }
-
-        // Figure out how may rows are present
-        m_in.setDevice(&m_csvFile);
-
-        while(!m_in.atEnd())
-        {
-            tmp = m_in.readLine(RowLength);
-            if(tmp.isNull())    {
-                err = QString("Reading failed in row: ")
-                            + QString::number(rows);
-                throw GYS::Exception(err);
-            }
-            if(tmp.length() == RowLength)   {
-                err = QString("File contain too long recorf in a row: ")
-                        + QString::number(rows);
-                throw GYS::Exception(err);
-            }
-            rows++;
+        if(tmp.length() == RowLength)   {
+            err = QString("File contain too long record in a row: ")
+                    + QString::number(rows);
+            throw GYS::Exception(err);
         }
-        m_rowNext = 0;
-        m_rowCount = rows;
-        m_in.seek(0);
+        rows++;
+    }
+    //m_rowNext = 0;
+    m_rowCount = rows;
+    m_in.seek(0);
 }
 
 quint32 GYS::CSVFetcher::getRowsCount() const
