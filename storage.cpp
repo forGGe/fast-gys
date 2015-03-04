@@ -305,5 +305,7 @@ void GYS::Storage::clearStorage()
         LOG_STREAM << query.lastError().type();
         LOG_STREAM << query.lastError().text();
     }
+
+    this->resetGetPosition();
 }
 
