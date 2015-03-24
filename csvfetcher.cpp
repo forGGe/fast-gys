@@ -121,35 +121,18 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
                         // { GYS::ItemType::DATE_ADDED, list.at(2) },
                     };
 
-                    //table.insert(clientID, rowData);
+                    QRegularExpression emailRegx("[a-zA-Z0-9\\._%+-]+@[a-zA-Z0-9\\.-]+\\.[a-zA-Z]{2,6}");
+                    QRegularExpressionMatch emailMatch = emailRegx.match(line);
 
-                    QRegularExpression nameRegxEm("[a-zA-Z0-9\\._%+-]+@[a-zA-Z0-9\\.-]+\\.[a-zA-Z]{2,6}");
-                    QRegularExpressionMatch nameMatchEm = nameRegxEm.match(line);
-
-                    if (nameMatchEm.hasMatch())
+                    if (emailMatch.hasMatch())
                     {
                         clientEm.first = GYS::ItemType::CONTACT_EMAIL;
-                        clientEm.second = nameMatchEm.captured().toLower();
+                        clientEm.second = emailMatch.captured().toLower();
 
                         rowData.push_back(clientEm);
-
-                        table.insert(clientID, rowData);
                     }
 
-                    if (!nameMatchEm.hasMatch())
-                    {
-                        if (nameMatch.hasMatch())   {
-                            clientID.first = GYS::ItemType::NAME_ID;
-                            clientID.second = nameMatch.captured().toLower();
-
-                            GYS::DataRow_Vec rowData =
-                            {
-                              { GYS::ItemType::NUM_ID, nameMatch.captured() },
-                            };
-
-                            table.insert(clientID, rowData);
-                        }
-                    }
+                    table.insert(clientID, rowData);
                 }
                 else
                 {
