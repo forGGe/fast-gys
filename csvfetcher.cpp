@@ -99,16 +99,13 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
             line = m_in.readLine();
             line.remove(QChar('\000'));
 
-            QStringList list = line.split(QChar('\t'));
-            for (auto it = list.begin(); it != list.end(); ++it)
-                it->remove(QChar('\"'));
-
             GYS::DataItem_Pair clientID;
+            GYS::DataItem_Pair clientEm;
 
-            if (!list.at(1).isEmpty())
+            if (!line.isEmpty())
             {
-                QRegularExpression nameRegx("^(([\\w-]+)\\.)+[a-zA-Z]{2,3}$");
-                QRegularExpressionMatch nameMatch = nameRegx.match(list.at(1));
+                QRegularExpression nameRegx("(([\\w-]+)\\.)+[a-zA-Z]{2,3}");
+                QRegularExpressionMatch nameMatch = nameRegx.match(line);
 
                 if (nameMatch.hasMatch())
                 {
@@ -118,17 +115,28 @@ GYS::DataTable_Map GYS::CSVFetcher::getData(quint32 rowsAmount)
 
                     GYS::DataRow_Vec rowData =
                     {
-                        { GYS::ItemType::NUM_ID, list.at(0) },
+                        { GYS::ItemType::NUM_ID, nameMatch.captured() },
                         // TODO: For now it doesn't needed
                         // should be removed
                         // { GYS::ItemType::DATE_ADDED, list.at(2) },
                     };
 
+                    QRegularExpression emailRegx("[a-zA-Z0-9\\._%+-]+@[a-zA-Z0-9\\.-]+\\.[a-zA-Z]{2,6}");
+                    QRegularExpressionMatch emailMatch = emailRegx.match(line);
+
+                    if (emailMatch.hasMatch())
+                    {
+                        clientEm.first = GYS::ItemType::CONTACT_EMAIL;
+                        clientEm.second = emailMatch.captured().toLower();
+
+                        rowData.push_back(clientEm);
+                    }
+
                     table.insert(clientID, rowData);
                 }
                 else
                 {
-                    LOG_STREAM << list.at(1) << " is not a site name!";
+                    LOG_STREAM << line << " is not a site name!";
                 }
             }
 
