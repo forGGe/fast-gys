@@ -84,7 +84,6 @@ private:
     QTextStream m_in;         /**< Stream for reading */
     quint64     m_rowCount;   /**< Amount of rows inside a file */
     quint64     m_rowNext;    /**< Next row for readin, excluding header */
-    quint64     m_nextChar;   /**< Next char to read. Need here to seek streams */
 };
 
 }

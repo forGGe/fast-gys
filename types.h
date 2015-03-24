@@ -33,6 +33,9 @@ enum class ItemType
     /** Type to represent client id, string form (site name actually) */
     NAME_ID,
 
+    /** Type to represent client e-mail, string form */
+    CONTACT_EMAIL,
+
     /** Type to represent date when site was added */
     DATE_ADDED,
 
