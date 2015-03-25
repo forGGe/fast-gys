@@ -85,7 +85,17 @@ void MainWindow::on_btnLoadFile_clicked()
                                                     ".",
                                                     "Comma separated value (*.csv)");
 
-    emit requestLoadFile(filePath);
+    GYS::FileFetcher fetcher(filePath);
+
+    QSqlRecord rec;
+    rec.append(QSqlField{"name", QVariant::String});
+    rec.append(QSqlField{"email", QVariant::String});
+
+    while (!fetcher.atEnd()) {
+        fetcher >> rec;
+        m_main->newData(rec);
+    }
+
 }
 
 void MainWindow::on_btnUpdateAll_clicked()

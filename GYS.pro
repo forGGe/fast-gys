@@ -16,17 +16,17 @@ CONFIG += c++11 console
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    csvfetcher.cpp \
     ranks.cpp \
-    controller.cpp \
-    mainclass.cpp
+    mainclass.cpp \
+    filefetcher.cpp
+    #controller.cpp \
 
 HEADERS  += mainwindow.h \
-    controller.h \
     types.h \
-    csvfetcher.h \
     exceptions.h \
     ranks.h \
-    mainclass.h
+    mainclass.h \
+    filefetcher.h
+    #controller.h \
 
 FORMS    += mainwindow.ui

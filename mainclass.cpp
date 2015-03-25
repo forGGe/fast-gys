@@ -57,6 +57,7 @@ void MainClass::setupDatabase()
                 "site_key INTEGER PRIMARY KEY, "
                 "site_id TEXT, "
                 "name TEXT UNIQUE, "
+                "email TEXT, "
                 "date TEXT, "
                 "rank INTEGER, "
                 "country TEXT, "
@@ -92,7 +93,6 @@ void MainClass::newData(const QSqlRecord record)
     // Check if the same site exists in database
     // If so - copy info from incoming record to the target record
     // If not - insert new record
-
     LOG_ENTRY;
     // TODO: do something with these magic strings
     int search_column = m_model->record().indexOf("name");
@@ -114,6 +114,7 @@ void MainClass::newData(const QSqlRecord record)
     // TODO: avoid using ugly indexing
     if (m_model->setRecord(list.at(0).row(), record) == false) {
         LOG_STREAM << "Failed to set record";
+        return;
     }
 }
 

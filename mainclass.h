@@ -23,8 +23,8 @@ private:
     void setupDatabase();
 
 private:
-    QSqlDatabase        m_db;
-    QSqlTableModel      *m_model;
+    QSqlDatabase     m_db;
+    QSqlTableModel   *m_model;
 
 public slots:
     void newData(const QSqlRecord record);
