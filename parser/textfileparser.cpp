@@ -1,36 +1,41 @@
 #include <QRegularExpressionMatch>
 #include <QSqlField>
+#include <QSqlRecord>
 
 #include "exceptions.h"
-#include "filefetcher.h"
+#include "textfileparser.h"
+#include "types.h"
 
+TextFileParser::TextFileParser()
+    :TextFileParser(nullptr)
 
-GYS::FileFetcher::FileFetcher(const QString &filePath)
-    :m_file(filePath) // I really hope that QFile checks if given string isn't empty
-    ,m_in()
-    ,m_nameRegx("(([\\w-]+)\\.)+[a-zA-Z]{2,3}")
-    ,m_emailRegx("[a-zA-Z0-9\\._%+-]+@[a-zA-Z0-9\\.-]+\\.[a-zA-Z]{2,6}")
 {
     LOG_ENTRY;
-
-    if (!m_file.open(QIODevice::ReadOnly))
-    {
-        QString err = QString("Erorr during opening: ") + m_file.errorString();
-        throw GYS::Exception(err);
-    }
-
-    m_in.setDevice(&m_file);
 }
 
-GYS::FileFetcher::~FileFetcher()
+TextFileParser::TextFileParser(QIODevice *device)
+    :m_nameRegx("(([\\w-]+)\\.)+[a-zA-Z]{2,3}")
+    ,m_emailRegx("[a-zA-Z0-9\\._%+-]+@[a-zA-Z0-9\\.-]+\\.[a-zA-Z]{2,6}")
+    ,m_in(device)
+{
+    LOG_ENTRY;
+}
+
+TextFileParser::~TextFileParser()
 {
     LOG_ENTRY;
     m_in.flush();
-    m_file.close();
 }
 
-GYS::FileFetcher& GYS::FileFetcher::operator >>(QSqlRecord &rval)
+void TextFileParser::setDevice(QIODevice *device)
 {
+    m_in.setDevice(device);
+}
+
+TextFileParser& TextFileParser::operator >>(QSqlRecord &rval)
+{
+    LOG_ENTRY;
+
     if (m_in.atEnd())
         throw GYS::Exception("Called in the end of the stream!");
 
@@ -62,7 +67,7 @@ GYS::FileFetcher& GYS::FileFetcher::operator >>(QSqlRecord &rval)
     return *this;
 }
 
-bool GYS::FileFetcher::atEnd() const
+bool TextFileParser::atEnd() const
 {
     return m_in.atEnd();
 }

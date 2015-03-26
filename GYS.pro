@@ -4,29 +4,23 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = GYS
-TEMPLATE = app
+TEMPLATE = subdirs
 
-QMAKE_CXXFLAGS += -Wpedantic -Wall -Wextra -Wformat
-CONFIG += c++11 console
+CONFIG += ordered
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    ranks.cpp \
-    mainclass.cpp \
-    filefetcher.cpp
-    #controller.cpp \
+SUBDIRS += \
+    core \
+    parser \
+    fetcher \
+    app \
 
-HEADERS  += mainwindow.h \
-    types.h \
-    exceptions.h \
-    ranks.h \
-    mainclass.h \
-    filefetcher.h
-    #controller.h \
+# Use .depends to specify that a project depends on another.
+app.depends += core
+app.depends += parser
+app.depends += fetcher
 
-FORMS    += mainwindow.ui
+fetcher.depends += core

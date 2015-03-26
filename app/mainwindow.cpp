@@ -8,10 +8,12 @@
 
 #include <QSqlTableModel>
 #include <QSqlField>
+#include <QThread>
 
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "filefetcher.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -84,18 +86,46 @@ void MainWindow::on_btnLoadFile_clicked()
                                                     "Open CSV",
                                                     ".",
                                                     "Comma separated value (*.csv)");
+#if 0
+    QFile file(filePath);
 
-    GYS::FileFetcher fetcher(filePath);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        //        QString err = QString("Erorr during opening: ") + file.errorString();
+        //        throw GYS::Exception(err);
+        return;
+    }
+
+    Parser *parser = new TextFileParser(&file);
 
     QSqlRecord rec;
     rec.append(QSqlField{"name", QVariant::String});
     rec.append(QSqlField{"email", QVariant::String});
 
-    while (!fetcher.atEnd()) {
-        fetcher >> rec;
+    while (!parser->atEnd()) {
+        parser->operator >>(rec);
         m_main->newData(rec);
     }
+#endif
 
+    Fetcher *fetcher = new FileFetcher< TextFileParser > (filePath);
+
+    QThread *fetcher_thread = new QThread;
+
+
+    QObject::connect(this, &MainWindow::requestLoadFile,
+                     fetcher, &Fetcher::start);
+
+    QObject::connect(fetcher, &Fetcher::send,
+                     m_main, &MainClass::newData);
+
+    QObject::connect(fetcher, &Fetcher::end,
+                     this, &MainWindow::fileLoadingDone);
+
+    fetcher->moveToThread(fetcher_thread);
+    fetcher_thread->start();
+
+    emit requestLoadFile();
 }
 
 void MainWindow::on_btnUpdateAll_clicked()
