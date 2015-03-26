@@ -117,6 +117,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="btnFindSimilar">
+        <property name="toolTip">
+         <string>Funtion has not been implemented yet</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>-1</number>
+        </property>
         <property name="text">
          <string>Find similar</string>
         </property>
@@ -124,6 +130,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="btnUpdateSimilar">
+        <property name="toolTip">
+         <string>Funtion has not been implemented yet</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
         <property name="text">
          <string>Update similar</string>
         </property>
