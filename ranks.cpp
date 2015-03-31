@@ -9,9 +9,10 @@
 #include <QtNetwork/QNetworkReply>
 #include <QXmlStreamReader>
 #include <QStack>
-
 #include "ranks.h"
 #include "exceptions.h"
+#include <QHostAddress>
+
 
 GYS::Ranks::Ranks(QObject *parent)
     :QObject(parent)
@@ -40,7 +41,18 @@ void GYS::Ranks::getRanksData(QString siteName)
     url.setHost("data.alexa.com");
     url.setPath("/data");
     url.setQuery(QString("cli=10&dat=snbamz&url=") + siteName);
-    m_mgr.get(QNetworkRequest(url));
+
+    qint32 res = 0;
+    res = (res << 8) | (qrand() % 20 + 172);
+    res = (res << 8) | (qrand() % 225 + 31);
+    res = (res << 8) | qrand() % 256;
+    res = (res << 8) | qrand() % 255;
+
+    QNetworkRequest tmp(url);
+    tmp.setRawHeader("X-FORWARDED-FOR", QHostAddress(res).toString().toUtf8());
+    tmp.setRawHeader("Via", QHostAddress(res).toString().toUtf8());
+    tmp.setRawHeader("CLIENT-IP", QHostAddress(res).toString().toUtf8());
+    m_mgr.get(tmp);
 }
 
 
