@@ -20,7 +20,8 @@ SOURCES += \
 
 HEADERS += \
     filefetcher.h \
-    fetcher.h
+    fetcher.h \
+    httpfetcher.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

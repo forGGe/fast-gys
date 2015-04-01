@@ -50,6 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_main->newData(rec);
     // }}
     // EOF example
+
+    // TODO: find better place for it
+    qRegisterMetaType < QSqlRecord > ("QSqlRecord");
 }
 
 MainWindow::~MainWindow()
@@ -130,7 +133,10 @@ void MainWindow::on_btnLoadFile_clicked()
 
 void MainWindow::on_btnUpdateAll_clicked()
 {
+    // TODO
     LOG_ENTRY;
+
+
 }
 
 void MainWindow::on_mainSitesTable_cellClicked(int row, int column)

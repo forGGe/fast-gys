@@ -39,7 +39,8 @@ TextFileParser& TextFileParser::operator >>(QSqlRecord &rval)
     if (m_in.atEnd())
         throw GYS::Exception("Called in the end of the stream!");
 
-    while (!m_in.atEnd()) {
+    while (!m_in.atEnd())
+    {
         QString line = m_in.readLine();
         line.remove(QChar('\000'));
 
@@ -47,6 +48,7 @@ TextFileParser& TextFileParser::operator >>(QSqlRecord &rval)
         {
             QRegularExpressionMatch nameMatch = m_nameRegx.match(line);
 
+            // Do not include records without domain names
             if (nameMatch.hasMatch())
             {
                 rval.clearValues();
@@ -57,10 +59,6 @@ TextFileParser& TextFileParser::operator >>(QSqlRecord &rval)
 
                 rval.setValue("name", nameMatch.captured().toLower());
                 break;
-            }
-            else
-            {
-                LOG_STREAM << line << " is not a site name!";
             }
         }
     }

@@ -16,3 +16,7 @@ void Fetcher::start()
     this->handleStart();
 }
 
+void Fetcher::process(QSqlRecord rec)
+{
+    this->handleProcess(rec);
+}

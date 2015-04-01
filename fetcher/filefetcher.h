@@ -1,32 +1,51 @@
 #ifndef FILEFETCHER_H
 #define FILEFETCHER_H
 
+/// \TODO: comments
+
+
 #include <QSqlRecord>
 #include <QString>
 #include <QFile>
-/// \TODO: comments
-/// \TODO: better hierarchy here
 
 #include "fetcher.h"
 #include "exceptions.h"
 
 ///
-/// \brief Simple file fetcher
+/// \brief Simple file fetcher.
 ///
 template < class DataParser >
 class FileFetcher : public Fetcher
 {
 public:
+    ///
+    /// \brief Constructs fetcher with given file.
+    /// \param[in] filePath File path to fetch data from.
+    /// \param[in] parent   Parent QObject.
+    ///
     FileFetcher(const QString &filePath, QObject *parent = 0);
     ~FileFetcher();
 
 protected:
+    ///
+    /// \brief Handles start signal from superclass.
+    ///
     virtual void handleStart();
 
+    ///
+    /// \brief Processes already existing record.
+    /// Doesn't make sence for File Fetcher, so it contains no implementation.
+    /// \param[in] rec Existing record.
+    ///
+    virtual void handleProcess(QSqlRecord rec);
+
 private:
-    QFile       m_file;
-    DataParser  m_parser;
+    QFile       m_file;     ///< File to parse
+    DataParser  m_parser;   ///< Template parser
 };
+
+//------------------------------------------------------------------------------
+// Public methods
 
 template < class DataParser >
 FileFetcher < DataParser >::FileFetcher(const QString &filePath, QObject *parent)
@@ -50,6 +69,9 @@ FileFetcher < DataParser >::~FileFetcher()
     m_file.close();
 }
 
+//------------------------------------------------------------------------------
+// Protected methods
+
 template < class DataParser >
 void FileFetcher < DataParser >::handleStart()
 {
@@ -63,5 +85,12 @@ void FileFetcher < DataParser >::handleStart()
         emit send(rec);
     }
 }
+
+template < class DataParser >
+void FileFetcher < DataParser >::handleProcess(QSqlRecord rec)
+{
+
+}
+
 
 #endif // FILEFETCHER_H
