@@ -5,19 +5,17 @@
 #-------------------------------------------------
 
 QT       -= gui
-QT       += sql xml
+QT       += sql xml network
 
 TARGET = core
 TEMPLATE = lib
 CONFIG += staticlib
 
 SOURCES += \
-    ranks.cpp \
 
 HEADERS += \
     types.h \
     exceptions.h \
-    ranks.h \
 
     #controller.cpp \
     #controller.h \

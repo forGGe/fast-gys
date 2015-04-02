@@ -37,7 +37,13 @@ protected:
     /// Doesn't make sence for File Fetcher, so it contains no implementation.
     /// \param[in] rec Existing record.
     ///
-    virtual void handleProcess(QSqlRecord rec);
+    virtual void handleProcess(QSqlRecord &rec);
+
+    ///
+    /// \brief Provides empty implementation.
+    /// See handleProcess()
+    ///
+    virtual void handleComplete();
 
 private:
     QFile       m_file;     ///< File to parse
@@ -84,13 +90,21 @@ void FileFetcher < DataParser >::handleStart()
         m_parser >> rec;
         emit send(rec);
     }
+
+    emit end();
 }
 
 template < class DataParser >
-void FileFetcher < DataParser >::handleProcess(QSqlRecord rec)
+void FileFetcher < DataParser >::handleProcess(QSqlRecord &rec)
 {
-
+    // See header for explanation why it is empty
 }
+template < class DataParser >
+void FileFetcher < DataParser >::handleComplete()
+{
+    // See header for explanation why it is empty
+}
+
 
 
 #endif // FILEFETCHER_H

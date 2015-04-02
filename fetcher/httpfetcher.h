@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QString>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QUrl>
+#include <QHostAddress>
 
 #include "fetcher.h"
 #include "exceptions.h"
@@ -36,10 +38,15 @@ protected:
     virtual void handleStart();
 
     ///
-    /// \brief Delegates processing of existing records to a subclass.
+    /// \brief Fetches Web data for existing record.
     /// \param[in] rec Exising record.
     ///
-    virtual void handleProcess(QSqlRecord rec);
+    virtual void handleProcess(QSqlRecord &rec);
+
+    ///
+    /// \brief Completes data processing.
+    ///
+    virtual void handleComplete();
 
 private slots:
     ///
@@ -49,8 +56,11 @@ private slots:
     void replyReady(QNetworkReply *reply);
 
 private:
-    DataParser            m_parser;  ///< Parses incoming responces.
-    QNetworkAccessManager *m_mgr;    ///< Holds request\responce management.
+    DataParser            m_parser;     ///< Parses incoming responces.
+    QNetworkAccessManager *m_mgr;       ///< Holds request\responce management.
+    quint32               m_pending;    ///< Amount of pending requests.
+    /// Indicates that no more input will be provided to this fetcher.
+    bool                  m_noMoreInput;
 };
 
 
@@ -62,6 +72,8 @@ HTTPfetcher < DataParser >::HTTPfetcher(QObject *parent)
     :Fetcher(parent)
     ,m_parser()
     ,m_mgr(nullptr)
+    ,m_pending(0)
+    ,m_noMoreInput(false)
 {
     m_mgr = new QNetworkAccessManager(this);
 
@@ -69,50 +81,95 @@ HTTPfetcher < DataParser >::HTTPfetcher(QObject *parent)
                      this, &HTTPfetcher::replyReady);
 }
 
+template < typename DataParser >
+HTTPfetcher < DataParser >::~HTTPfetcher()
+{
+    delete m_mgr;
+}
+
 //------------------------------------------------------------------------------
 // Protected methods
 
 template < typename DataParser >
-HTTPfetcher < DataParser >::handleStart()
+void HTTPfetcher < DataParser >::handleStart()
 {
     // TODO:
 }
 
 template < typename DataParser >
-HTTPfetcher < DataParser >::handleProcess(QSqlRecord rec)
+void HTTPfetcher < DataParser >::handleProcess(QSqlRecord &rec)
 {
     // TODO: make link customizable
+    // TODO: move head of link to the ctor
     QUrl url;
     url.setScheme("http");
     url.setHost("data.alexa.com");
     url.setPath("/data");
     url.setQuery(QString("cli=10&dat=snbamz&url=") + rec.value("name").toString());
-    m_mgr->get(QNetworkRequest(url));
 
+    // Generated _public_ IP, according to IANA restrictions,
+    // in range  from 173.0.0.1 to 191.255.255.254
+    // excluding multicast and broadcast addresses
+    qint32 ip = 0;
+    ip = (ip << 8) | (qrand() % 29 + 173);  // MSB from 173 to 191
+    ip = (ip << 8) | (qrand() % 255);       // 2nd byte from 0 to 255
+    ip = (ip << 8) | (qrand() % 255);       // 3rd byte from 0 to 255
+    ip = (ip << 8) | (qrand() % 253 + 1);   // LSB from 1 to 254
+    // TODO: Apply more strict boundaries according to
+    // https://en.wikipedia.org/wiki/Reserved_IP_addresses
+
+    const QByteArray &header = QHostAddress(ip).toString().toUtf8();
+
+    QNetworkRequest req(url);
+    req.setRawHeader("X-FORWARDED-FOR", header);
+    req.setRawHeader("Via", header);
+    req.setRawHeader("CLIENT-IP", header);
+
+    m_mgr->get(req);
+
+    ++m_pending;
+}
+
+template < typename DataParser >
+void HTTPfetcher < DataParser >::handleComplete()
+{
+    m_noMoreInput = true;
 }
 
 //------------------------------------------------------------------------------
 // Private methods
 
 template < typename DataParser >
-HTTPfetcher < DataParser >::replyReady(QNetworkReply *reply)
+void HTTPfetcher < DataParser >::replyReady(QNetworkReply *reply)
 {
-    m_parser.setDevice(reply);
+    // TODO: error check && catch exceptions
+    if (reply->error())
+    {
+        LOG_STREAM << "Erorr occurs for url " << reply->url().toString();
+        LOG_STREAM << reply->errorString();
+        reply->deleteLater();
+        return;
+    }
 
     QSqlRecord rec;
 
     // TODO: move it to parser
     rec.append(QSqlField{"name", QVariant::String});
-    rec.append(QSqlField{"email", QVariant::String});
     rec.append(QSqlField{"rank", QVariant::String});
     rec.append(QSqlField{"local_rank", QVariant::String});
     rec.append(QSqlField{"country", QVariant::String});
 
+    m_parser.setDevice(reply);
     while (!m_parser.atEnd())
     {
         m_parser >> rec;
         emit send(rec);
     }
+
+    if (!(--m_pending) && m_noMoreInput)
+        emit end();
+
+    reply->deleteLater();
 }
 
 #endif // HTTP_FETCHER_H

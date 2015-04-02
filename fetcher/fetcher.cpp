@@ -20,3 +20,8 @@ void Fetcher::process(QSqlRecord rec)
 {
     this->handleProcess(rec);
 }
+
+void Fetcher::complete()
+{
+    this->handleComplete();
+}

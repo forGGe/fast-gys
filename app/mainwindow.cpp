@@ -9,11 +9,14 @@
 #include <QSqlTableModel>
 #include <QSqlField>
 #include <QThread>
+#include <QThreadPool>
 
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "filefetcher.h"
+#include "httpfetcher.h"
+#include "rankXMLparser.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -74,6 +77,9 @@ void MainWindow::lauchDone()
 void MainWindow::fileLoadingDone()
 {
     LOG_ENTRY;
+    QMessageBox msg;
+    msg.setText("File loaded");
+    msg.exec();
 }
 
 void MainWindow::displayError(QString descr)
@@ -89,41 +95,26 @@ void MainWindow::on_btnLoadFile_clicked()
                                                     "Open CSV",
                                                     ".",
                                                     "Comma separated value (*.csv)");
-#if 0
-    QFile file(filePath);
 
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        //        QString err = QString("Erorr during opening: ") + file.errorString();
-        //        throw GYS::Exception(err);
-        return;
-    }
-
-    Parser *parser = new TextFileParser(&file);
-
-    QSqlRecord rec;
-    rec.append(QSqlField{"name", QVariant::String});
-    rec.append(QSqlField{"email", QVariant::String});
-
-    while (!parser->atEnd()) {
-        parser->operator >>(rec);
-        m_main->newData(rec);
-    }
-#endif
-
+    // TODO: delegate this to the MainClass
     Fetcher *fetcher = new FileFetcher< TextFileParser > (filePath);
 
     QThread *fetcher_thread = new QThread;
 
 
+    // Avoiding leaks by using 'deleteLater()' slot
     QObject::connect(this, &MainWindow::requestLoadFile,
                      fetcher, &Fetcher::start);
-
     QObject::connect(fetcher, &Fetcher::send,
                      m_main, &MainClass::newData);
-
     QObject::connect(fetcher, &Fetcher::end,
                      this, &MainWindow::fileLoadingDone);
+    QObject::connect(fetcher, &Fetcher::end,
+                     fetcher_thread, &QThread::quit);
+    QObject::connect(fetcher, &Fetcher::end,
+                     fetcher, &Fetcher::deleteLater);
+    QObject::connect(fetcher, &Fetcher::end,
+                     fetcher_thread, &QThread::deleteLater);
 
     fetcher->moveToThread(fetcher_thread);
     fetcher_thread->start();
@@ -133,10 +124,29 @@ void MainWindow::on_btnLoadFile_clicked()
 
 void MainWindow::on_btnUpdateAll_clicked()
 {
-    // TODO
     LOG_ENTRY;
 
+    // TODO: delegate this to the MainClass
+    // Get all data from table
+    // feed fetcher with that data
+    // signal about end
 
+    // EXAMPLE CODE
+    QSqlRecord rec;
+    QSqlField name("name", QVariant::String);
+    rec.append(name);
+    rec.setValue("name", "ebay.com");
+
+    Fetcher *fetcher = new HTTPfetcher< RankXMLParser >;
+
+    QObject::connect(fetcher, &Fetcher::send,
+                     m_main, &MainClass::newData);
+    QObject::connect(fetcher, &Fetcher::end,
+                     this, &MainWindow::fileLoadingDone);
+
+
+    fetcher->process(rec);
+    fetcher->complete();
 }
 
 void MainWindow::on_mainSitesTable_cellClicked(int row, int column)

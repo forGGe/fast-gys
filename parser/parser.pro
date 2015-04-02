@@ -20,11 +20,13 @@ CONFIG += c++11 console
 INCLUDEPATH += ../core
 
 SOURCES += \
-    textfileparser.cpp
+    textfileparser.cpp \
+    rankXMLparser.cpp
 
 HEADERS += \
     parser.h \
-    textfileparser.h
+    textfileparser.h \
+    rankXMLparser.h
 
 unix {
     target.path = /usr/lib
