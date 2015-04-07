@@ -36,10 +36,6 @@ Parser& RankXMLParser::operator >>(QSqlRecord &rval)
     // add some additional XML structures
     QVector< QPair< QString, QPair< QString, QString >>> dataPairs =
     {
-        // Target element: SD, target attribute: HOST,
-        // will be placed at column "name"
-        { "name",       { "SD",         "HOST" }},
-
         // Target element: POPULARITY, target attribute: TEXT,
         // will be placed at column "rank"
         { "rank",       { "POPULARITY", "TEXT" }},

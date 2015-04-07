@@ -14,7 +14,7 @@ class MainClass : public QObject
 {
     Q_OBJECT
 public:
-    MainClass(QObject *parent = nullptr);
+    MainClass(MainWindow *parent);
     ~MainClass();
 
     void setupView(QAbstractItemView *view);
@@ -25,10 +25,16 @@ private:
 private:
     QSqlDatabase     m_db;
     QSqlTableModel   *m_model;
+    MainWindow       *m_mw;
 
 public slots:
     void newData(const QSqlRecord record);
     void updateData(const QSqlRecord record);
+
+private slots:
+    // Not thread safe slot since using references, but faster
+    void loadFile(const QString &filePath);
+    void updateAll();
 };
 
 

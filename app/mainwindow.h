@@ -34,10 +34,9 @@ private:
     Ui::MainWindow 	*ui;
     MainClass 		*m_main;
 
-
 signals:
     void exiting();
-    void requestLoadFile();
+    void requestLoadFile(const QString &filePath);
     void requestUpdateRating(GYS::Sites_List sites);
     void requestUpdateAll();
     void requestFindSimilar(QStringList sites);
@@ -47,6 +46,7 @@ signals:
 public slots:
     void lauchDone();
     void fileLoadingDone();
+    void updateDone();
     void displayError(QString descr);
 };
 

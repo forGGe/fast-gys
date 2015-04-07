@@ -84,7 +84,7 @@ HTTPfetcher < DataParser >::HTTPfetcher(QObject *parent)
 template < typename DataParser >
 HTTPfetcher < DataParser >::~HTTPfetcher()
 {
-    delete m_mgr;
+
 }
 
 //------------------------------------------------------------------------------
@@ -148,10 +148,30 @@ void HTTPfetcher < DataParser >::replyReady(QNetworkReply *reply)
         LOG_STREAM << "Erorr occurs for url " << reply->url().toString();
         LOG_STREAM << reply->errorString();
         reply->deleteLater();
+        // TODO: BUG: if error occurs, pending counter will not be decreased
+        // and object will not emit done() signal
         return;
     }
 
     QSqlRecord rec;
+
+
+    // TODO: customasible URL
+    QString query; // URL query string
+    QString param("&url=");
+    int idx;
+
+    // Strip out domain from URL.
+    // This is necessary because a data retrieved after fetching
+    // will not contain target domain OR
+    // it will contain normalized or redirected form.
+    // I.e. 'somesite.com' instead of 'www.somesite.com'
+    // Such aliasing will result in duplicated records.
+    // Semantically both are equal, but refers different objects
+    // in database.
+    query = reply->url().query();
+    idx = query.indexOf(param);
+    idx += param.size();
 
     // TODO: move it to parser
     rec.append(QSqlField{"name", QVariant::String});
@@ -163,6 +183,7 @@ void HTTPfetcher < DataParser >::replyReady(QNetworkReply *reply)
     while (!m_parser.atEnd())
     {
         m_parser >> rec;
+        rec.setValue("name",  query.mid(idx));
         emit send(rec);
     }
 

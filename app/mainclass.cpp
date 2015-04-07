@@ -3,28 +3,39 @@
 #include <QSqlError>
 #include <QSqlTableModel>
 #include <QAbstractItemView>
+#include <QThread>
 
 #include "mainclass.h"
 #include "mainwindow.h"
 #include "exceptions.h"
+#include "filefetcher.h"
+#include "httpfetcher.h"
+#include "rankXMLparser.h"
 
-MainClass::MainClass(QObject *parent)
+MainClass::MainClass(MainWindow *parent)
     :QObject(parent)
     ,m_db(QSqlDatabase::addDatabase("QSQLITE"))
     ,m_model(nullptr)
+    ,m_mw(parent)
 {
     LOG_ENTRY;
 
     setupDatabase();
 
     m_model = new QSqlTableModel(this, m_db);
-    m_model->setEditStrategy(QSqlTableModel::OnFieldChange);
+    // TODO: may have performance impact, should be used 'on sumbit'
+    // technique
+    m_model->setEditStrategy(QSqlTableModel::OnRowChange);
     m_model->setTable("Sites");
 
     // TODO: do something with those magic numbers
     //m_model->setHeaderData(0, Qt::Horizontal, "ID");
     //m_model->setHeaderData(1, Qt::Horizontal, "Domain");
-    m_model->select();
+
+    QObject::connect(m_mw, &MainWindow::requestUpdateAll,
+                     this, &MainClass::updateAll);
+    QObject::connect(m_mw, &MainWindow::requestLoadFile,
+                     this, &MainClass::loadFile);
 }
 
 MainClass::~MainClass()
@@ -36,6 +47,7 @@ MainClass::~MainClass()
 void MainClass::setupView(QAbstractItemView *view)
 {
     view->setModel(m_model);
+    m_model->select();
 }
 
 void MainClass::setupDatabase()
@@ -124,4 +136,73 @@ void MainClass::updateData(const QSqlRecord record)
     if (m_model->setRecord(0, record) == false) {
         LOG_STREAM << "Failed to set record";
     }
+}
+
+void MainClass::loadFile(const QString &filePath)
+{
+    Fetcher *fetcher = new FileFetcher< TextFileParser > (filePath);
+
+    QThread *fetcher_thread = new QThread;
+
+    QObject::connect(fetcher, &Fetcher::send,
+                     this, &MainClass::newData);
+
+    // Avoiding leaks by using 'deleteLater()' slot
+    QObject::connect(fetcher, &Fetcher::end,
+                     m_mw, &MainWindow::fileLoadingDone);
+    QObject::connect(fetcher, &Fetcher::end,
+                     fetcher_thread, &QThread::quit);
+    QObject::connect(fetcher, &Fetcher::end,
+                     fetcher, &Fetcher::deleteLater);
+    QObject::connect(fetcher, &Fetcher::end,
+                     fetcher_thread, &QThread::deleteLater);
+
+    fetcher->moveToThread(fetcher_thread);
+    fetcher_thread->start();
+
+    QMetaObject::invokeMethod(fetcher, "start");
+}
+
+void MainClass::updateAll()
+{
+    // TODO: delegate this to the MainClass
+    // Get all data from table
+    // feed fetcher with that data
+    // signal about end
+
+    // EXAMPLE CODE
+    //QSqlRecord rec;
+    //QSqlField name("name", QVariant::String);
+    //rec.append(name);
+    //rec.setValue("name", "ebay.com");
+
+    Fetcher *fetcher = new HTTPfetcher< RankXMLParser >;
+    QThread *fetcher_thread = new QThread;
+
+    QObject::connect(fetcher, &Fetcher::send,
+                     this, &MainClass::newData);
+    QObject::connect(fetcher, &Fetcher::end,
+                     m_mw, &MainWindow::updateDone);
+
+    // Avoiding leaks by using 'deleteLater()' slot
+    QObject::connect(fetcher, &Fetcher::end,
+                     fetcher_thread, &QThread::quit);
+    QObject::connect(fetcher, &Fetcher::end,
+                     fetcher, &Fetcher::deleteLater);
+    QObject::connect(fetcher, &Fetcher::end,
+                     fetcher_thread, &QThread::deleteLater);
+
+    fetcher->moveToThread(fetcher_thread);
+    fetcher_thread->start();
+
+    for (int i = 0; i < m_model->rowCount(); ++i)
+    {
+        QSqlRecord rec = m_model->record(i);
+        QMetaObject::invokeMethod(fetcher, "process", Qt::QueuedConnection,
+                                  Q_ARG(QSqlRecord, rec));
+    }
+
+    // Now when fetcher knows that last data was provided
+    // it will emit end() signal after work will be done
+    QMetaObject::invokeMethod(fetcher, "complete");
 }

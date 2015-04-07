@@ -7,6 +7,7 @@
 #include <QSqlRecord>
 #include <QString>
 #include <QFile>
+#include <QSqlField>
 
 #include "fetcher.h"
 #include "exceptions.h"
@@ -62,6 +63,7 @@ FileFetcher < DataParser >::FileFetcher(const QString &filePath, QObject *parent
     if (!m_file.open(QIODevice::ReadOnly))
     {
         QString err = QString("Erorr during opening: ") + m_file.errorString();
+
         throw GYS::Exception(err);
         return;
     }
