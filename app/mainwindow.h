@@ -3,12 +3,15 @@
 
 #include <QMainWindow>
 
-#include "controller.h"
+#include "mainclass.h"
 #include "types.h"
+#include "textfileparser.h"
 
 namespace Ui {
 class MainWindow;
 }
+
+class QAbstractItemModel;
 
 class MainWindow : public QMainWindow
 {
@@ -18,39 +21,33 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-protected:
-    virtual void keyPressEvent(QKeyEvent *event);
-
 private slots:
     void on_btnExit_clicked();
     void on_btnLoadFile_clicked();
     void on_btnUpdateAll_clicked();
     void on_mainSitesTable_cellClicked(int row, int column);
-
     void on_btnUpdateSelected_clicked();
-
     void on_checkBox_stateChanged(int arg1);
-
     void on_pushButton_clicked();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow 	*ui;
+    MainClass 		*m_main;
 
 signals:
     void exiting();
-    void requestLoadFile(QString file_name);
+    void requestLoadFile(const QString &filePath);
     void requestUpdateRating(GYS::Sites_List sites);
     void requestUpdateAll();
-    void requestFindSimilar(QList< QString > sites);
-    void requestUpdateSimilar(QList< QString > sites);
+    void requestFindSimilar(QStringList sites);
+    void requestUpdateSimilar(QStringList sites);
     void requestDeleteAllFromDatabase();
 
 public slots:
     void lauchDone();
     void fileLoadingDone();
-    void clearTable();
-    void recieveSitesData(GYS::DataTable_Map data);
-    void errorSlot(QString descr);
+    void updateDone();
+    void displayError(QString descr);
 };
 
 #endif // MAINWINDOW_H
