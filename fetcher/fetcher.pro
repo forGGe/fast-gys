@@ -12,8 +12,10 @@ TARGET = fetcher
 TEMPLATE = lib
 CONFIG += staticlib
 
-QMAKE_CXXFLAGS += -Wpedantic -Wall -Wextra -Wformat
-CONFIG += c++11 console
+# Check if the config file exists
+! include( ../common.pri ) {
+    error( "Couldn't find the common.pri file!" )
+}
 
 SOURCES += \
     fetcher.cpp

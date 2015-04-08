@@ -24,3 +24,5 @@ app.depends += parser
 app.depends += fetcher
 
 fetcher.depends += core
+
+

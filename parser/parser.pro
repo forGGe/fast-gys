@@ -12,8 +12,10 @@ TARGET = parser
 TEMPLATE = lib
 CONFIG += staticlib
 
-QMAKE_CXXFLAGS += -Wpedantic -Wall -Wextra -Wformat
-CONFIG += c++11 console
+# Check if the config file exists
+! include( ../common.pri ) {
+    error( "Couldn't find the common.pri file!" )
+}
 
 # UGLY
 # will be removed, when some dependecies will be placed outside core
@@ -32,3 +34,4 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+

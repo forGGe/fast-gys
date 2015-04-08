@@ -65,7 +65,7 @@ void MainWindow::updateDone()
 
 void MainWindow::displayError(QString descr)
 {
-    LOG_ENTRY;
+    (void) descr;
 }
 
 // TODO: highest priority
@@ -88,6 +88,9 @@ void MainWindow::on_btnUpdateAll_clicked()
 
 void MainWindow::on_mainSitesTable_cellClicked(int row, int column)
 {
+    (void) row;
+    (void) column;
+
     LOG_ENTRY;
 }
 
@@ -98,6 +101,7 @@ void MainWindow::on_btnUpdateSelected_clicked()
 
 void MainWindow::on_checkBox_stateChanged(int arg1)
 {
+    (void) arg1;
     LOG_ENTRY;
 }
 

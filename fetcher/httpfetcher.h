@@ -30,6 +30,10 @@ public:
     ///
     ~HTTPfetcher();
 
+    // Copying is not permitted.
+    HTTPfetcher(HTTPfetcher &) = delete;
+    HTTPfetcher& operator =(HTTPfetcher &) = delete;
+
 protected:
     ///
     /// \brief Empty implementation.

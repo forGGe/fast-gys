@@ -11,9 +11,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = app
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -Wpedantic -Wall -Wextra -Wformat
-CONFIG += c++11 console
-
+# Check if the config file exists
+! include( ../common.pri ) {
+    error( "Couldn't find the common.pri file!" )
+}
 SOURCES += \
     main.cpp \
     mainwindow.cpp \

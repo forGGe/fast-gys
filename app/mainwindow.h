@@ -21,6 +21,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    // Copying is not permitted.
+    MainWindow(const MainWindow&) = delete;
+    MainWindow& operator =(MainWindow &) = delete;
+
 private slots:
     void on_btnExit_clicked();
     void on_btnLoadFile_clicked();

@@ -17,6 +17,10 @@ public:
     MainClass(MainWindow *parent);
     ~MainClass();
 
+    // Copying is not permitted.
+    MainClass(const MainClass&) = delete;
+    MainClass& operator =(const MainClass&) = delete;
+
     void setupView(QAbstractItemView *view);
 
 private:

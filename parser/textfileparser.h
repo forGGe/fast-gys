@@ -27,7 +27,7 @@ public:
 
     ///
     /// \brief Constructs parser using device with source data.
-    /// \param[in] filePath A file which contains records.
+    /// \param[in] device A device which contains records.
     ///
     TextFileParser(QIODevice *device);
 

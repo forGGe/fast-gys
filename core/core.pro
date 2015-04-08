@@ -11,6 +11,11 @@ TARGET = core
 TEMPLATE = lib
 CONFIG += staticlib
 
+# Check if the config file exists
+! include( ../common.pri ) {
+    error( "Couldn't find the common.pri file!" )
+}
+
 SOURCES += \
 
 HEADERS += \

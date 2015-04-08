@@ -99,8 +99,10 @@ void FileFetcher < DataParser >::handleStart()
 template < class DataParser >
 void FileFetcher < DataParser >::handleProcess(QSqlRecord &rec)
 {
+    (void) rec;
     // See header for explanation why it is empty
 }
+
 template < class DataParser >
 void FileFetcher < DataParser >::handleComplete()
 {

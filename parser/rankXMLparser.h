@@ -48,7 +48,7 @@ public:
     virtual bool atEnd() const;
 
 private:
-    QXmlStreamReader m_xml; //< Allows read XML in a form of stream
+    QXmlStreamReader m_xml; ///< Allows read XML in a form of stream
 
 };
 
