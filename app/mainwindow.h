@@ -4,8 +4,6 @@
 #include <QMainWindow>
 
 #include "mainclass.h"
-#include "types.h"
-#include "textfileparser.h"
 
 namespace Ui {
 class MainWindow;
@@ -41,7 +39,6 @@ private:
 signals:
     void exiting();
     void requestLoadFile(const QString &filePath);
-    void requestUpdateRating(GYS::Sites_List sites);
     void requestUpdateAll();
     void requestFindSimilar(QStringList sites);
     void requestUpdateSimilar(QStringList sites);

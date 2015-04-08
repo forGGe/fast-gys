@@ -9,7 +9,6 @@ class MainWindow;
 class QSqlTableModel;
 class QAbstractItemView;
 
-
 class MainClass : public QObject
 {
     Q_OBJECT

@@ -22,9 +22,6 @@ HEADERS += \
     types.h \
     exceptions.h \
 
-    #controller.cpp \
-    #controller.h \
-
 QMAKE_CXXFLAGS += -Wpedantic -Wall -Wextra -Wformat
 CONFIG += c++11 console
 

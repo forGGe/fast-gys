@@ -37,7 +37,7 @@ TextFileParser& TextFileParser::operator >>(QSqlRecord &rval)
     LOG_ENTRY;
 
     if (m_in.atEnd())
-        throw GYS::Exception("Called in the end of the stream!");
+        throw Exception("Called in the end of the stream!");
 
     while (!m_in.atEnd())
     {

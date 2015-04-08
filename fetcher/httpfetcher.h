@@ -1,7 +1,6 @@
 #ifndef HTTP_FETCHER_H
 #define HTTP_FETCHER_H
 
-#include <QObject>
 #include <QString>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -10,6 +9,7 @@
 
 #include "fetcher.h"
 #include "exceptions.h"
+#include "types.h"
 
 ///
 /// \brief Class used to fetch data from HTTP responce.

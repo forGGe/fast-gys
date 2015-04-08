@@ -9,10 +9,8 @@
 #include "parser.h"
 
 
-class QString;
 class QSqlRecord;
 class QIODevice;
-
 
 ///
 /// \brief Parsers records from file

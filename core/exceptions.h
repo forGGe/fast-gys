@@ -3,9 +3,6 @@
 
 #include <QString>
 
-namespace GYS
-{
-
 class Exception
 {
 public:
@@ -26,7 +23,7 @@ protected:
     QString m_str;
 };
 
-class NotImplemented : public GYS::Exception
+class NotImplemented : public Exception
 {
 public:
     NotImplemented(const QString &str)
@@ -40,8 +37,6 @@ public:
 
     }
 };
-
-}
 
 
 #endif // GYS_EXCEPTIONS_H

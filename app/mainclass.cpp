@@ -11,6 +11,7 @@
 #include "filefetcher.h"
 #include "httpfetcher.h"
 #include "rankXMLparser.h"
+#include "textfileparser.h"
 
 MainClass::MainClass(MainWindow *parent)
     :QObject(parent)
@@ -60,7 +61,7 @@ void MainClass::setupDatabase()
     m_db.setPassword("pass");
 
     if (m_db.open() == false)
-        throw GYS::Exception("Cannot open database");
+        throw Exception("Cannot open database");
 
     // TODO: do something with these magic strings
     QString createTable(
@@ -85,7 +86,7 @@ void MainClass::setupDatabase()
         LOG_STREAM << query.lastError().text();
         // Need to create table ONLY if such doesn't exist
         // uncomment it, when things will be changed
-        // throw GYS::Exception("Cannot query database");
+        // throw Exception("Cannot query database");
     }
 
     while(query.next())

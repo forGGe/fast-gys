@@ -1,9 +1,7 @@
 #ifndef FILEFETCHER_H
 #define FILEFETCHER_H
 
-/// \TODO: comments
-
-
+/// \TODO: commentsWW
 #include <QSqlRecord>
 #include <QString>
 #include <QFile>
@@ -64,7 +62,7 @@ FileFetcher < DataParser >::FileFetcher(const QString &filePath, QObject *parent
     {
         QString err = QString("Erorr during opening: ") + m_file.errorString();
 
-        throw GYS::Exception(err);
+        throw Exception(err);
         return;
     }
 
