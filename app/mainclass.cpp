@@ -65,7 +65,7 @@ void MainClass::setupDatabase()
 
     // TODO: do something with these magic strings
     QString createTable(
-                "CREATE TABLE Sites "
+                "CREATE TABLE IF NOT EXISTS Sites "
                 "( "
                 "site_key INTEGER PRIMARY KEY, "
                 "site_id TEXT, "
@@ -84,9 +84,27 @@ void MainClass::setupDatabase()
     {
         LOG_STREAM << query.lastError().type();
         LOG_STREAM << query.lastError().text();
-        // Need to create table ONLY if such doesn't exist
-        // uncomment it, when things will be changed
-        // throw Exception("Cannot query database");
+    }
+
+    // columns' names from CREATE TABLE block
+    // this hardcode should be modified every time while altering the table
+    QString columnsNames[9];
+    columnsNames[0] = "site_key";
+    columnsNames[1] = "site_id";
+    columnsNames[2] = "name";
+    columnsNames[3] = "email";
+    columnsNames[4] = "date";
+    columnsNames[5] = "rank";
+    columnsNames[6] = "country";
+    columnsNames[7] = "local_rank";
+    columnsNames[8] = "date_updated";
+
+    // checking the structure of a table
+    QSqlRecord columns = m_db.record("Sites");
+    for(int i = 0; i < 9; i++)
+    {
+        if (columns.fieldName(i) != columnsNames[i])
+            throw Exception("Table Sites has incorrect structure");
     }
 
     while(query.next())
