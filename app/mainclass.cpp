@@ -13,6 +13,8 @@
 #include "rankXMLparser.h"
 #include "textfileparser.h"
 
+#include <QMessageBox>
+
 MainClass::MainClass(MainWindow *parent)
     :QObject(parent)
     ,m_db(QSqlDatabase::addDatabase("QSQLITE"))
@@ -88,22 +90,21 @@ void MainClass::setupDatabase()
 
     // columns' names from CREATE TABLE block
     // this hardcode should be modified every time while altering the table
-    QString columnsNames[9];
-    columnsNames[0] = "site_key";
-    columnsNames[1] = "site_id";
-    columnsNames[2] = "name";
-    columnsNames[3] = "email";
-    columnsNames[4] = "date";
-    columnsNames[5] = "rank";
-    columnsNames[6] = "country";
-    columnsNames[7] = "local_rank";
-    columnsNames[8] = "date_updated";
+    QVector<QString> columnsNames = {"site_key",
+                                     "site_id",
+                                     "name",
+                                     "email",
+                                     "date",
+                                     "rank",
+                                     "country",
+                                     "local_rank",
+                                     "date_updated"};
 
     // checking the structure of a table
     QSqlRecord columns = m_db.record("Sites");
-    for(int i = 0; i < 9; i++)
+    for(auto column : columnsNames)
     {
-        if (columns.fieldName(i) != columnsNames[i])
+        if (columns.indexOf(column) == -1)
             throw Exception("Table Sites has incorrect structure");
     }
 
