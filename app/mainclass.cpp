@@ -13,6 +13,8 @@
 #include "rankXMLparser.h"
 #include "textfileparser.h"
 
+#include <QMessageBox>
+
 MainClass::MainClass(MainWindow *parent)
     :QObject(parent)
     ,m_db(QSqlDatabase::addDatabase("QSQLITE"))
@@ -65,7 +67,7 @@ void MainClass::setupDatabase()
 
     // TODO: do something with these magic strings
     QString createTable(
-                "CREATE TABLE Sites "
+                "CREATE TABLE IF NOT EXISTS Sites "
                 "( "
                 "site_key INTEGER PRIMARY KEY, "
                 "site_id TEXT, "
@@ -84,9 +86,26 @@ void MainClass::setupDatabase()
     {
         LOG_STREAM << query.lastError().type();
         LOG_STREAM << query.lastError().text();
-        // Need to create table ONLY if such doesn't exist
-        // uncomment it, when things will be changed
-        // throw Exception("Cannot query database");
+    }
+
+    // columns' names from CREATE TABLE block
+    // this hardcode should be modified every time while altering the table
+    QVector<QString> columnsNames = {"site_key",
+                                     "site_id",
+                                     "name",
+                                     "email",
+                                     "date",
+                                     "rank",
+                                     "country",
+                                     "local_rank",
+                                     "date_updated"};
+
+    // checking the structure of a table
+    QSqlRecord columns = m_db.record("Sites");
+    for(auto column : columnsNames)
+    {
+        if (columns.indexOf(column) == -1)
+            throw Exception("Table Sites has incorrect structure");
     }
 
     while(query.next())
