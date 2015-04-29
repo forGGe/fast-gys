@@ -13,8 +13,6 @@
 #include "rankXMLparser.h"
 #include "textfileparser.h"
 
-#include <QMessageBox>
-
 MainClass::MainClass(MainWindow *parent)
     :QObject(parent)
     ,m_db(QSqlDatabase::addDatabase("QSQLITE"))
