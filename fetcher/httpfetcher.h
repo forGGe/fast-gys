@@ -39,18 +39,18 @@ protected:
     /// \brief Empty implementation.
     /// \TODO Should be supported as soon as url will be customizable.
     ///
-    virtual void handleStart();
+    virtual void handleStart() noexcept;
 
     ///
     /// \brief Fetches Web data for existing record.
     /// \param[in] rec Exising record.
     ///
-    virtual void handleProcess(QSqlRecord &rec);
+    virtual void handleProcess(QSqlRecord &rec) noexcept;
 
     ///
     /// \brief Completes data processing.
     ///
-    virtual void handleComplete();
+    virtual void handleComplete() noexcept;
 
 private slots:
     ///
@@ -88,54 +88,65 @@ HTTPfetcher < DataParser >::HTTPfetcher(QObject *parent)
 template < typename DataParser >
 HTTPfetcher < DataParser >::~HTTPfetcher()
 {
-
+    // m_mgr deletes automatically, as its reference
+    // was added to the Qt object tree
 }
 
 //------------------------------------------------------------------------------
 // Protected methods
 
 template < typename DataParser >
-void HTTPfetcher < DataParser >::handleStart()
+void HTTPfetcher < DataParser >::handleStart() noexcept
 {
     // TODO:
 }
 
 template < typename DataParser >
-void HTTPfetcher < DataParser >::handleProcess(QSqlRecord &rec)
+void HTTPfetcher < DataParser >::handleProcess(QSqlRecord &rec) noexcept
 {
-    // TODO: make link customizable
-    // TODO: move head of link to the ctor
-    QUrl url;
-    url.setScheme("http");
-    url.setHost("data.alexa.com");
-    url.setPath("/data");
-    url.setQuery(QString("cli=10&dat=snbamz&url=") + rec.value("name").toString());
+    try
+    {
+        // TODO: make link customizable
+        // TODO: move head of link to the ctor
+        QUrl url;
+        url.setScheme("http");
+        url.setHost("data.alexa.com");
+        url.setPath("/data");
+        url.setQuery(QString("cli=10&dat=snbamz&url=") + rec.value("name").toString());
 
-    // Generated _public_ IP, according to IANA restrictions,
-    // in range  from 173.0.0.1 to 191.255.255.254
-    // excluding multicast and broadcast addresses
-    qint32 ip = 0;
-    ip = (ip << 8) | (qrand() % 29 + 173);  // MSB from 173 to 191
-    ip = (ip << 8) | (qrand() % 255);       // 2nd byte from 0 to 255
-    ip = (ip << 8) | (qrand() % 255);       // 3rd byte from 0 to 255
-    ip = (ip << 8) | (qrand() % 253 + 1);   // LSB from 1 to 254
-    // TODO: Apply more strict boundaries according to
-    // https://en.wikipedia.org/wiki/Reserved_IP_addresses
+        // Generated _public_ IP, according to IANA restrictions,
+        // in range  from 173.0.0.1 to 191.255.255.254
+        // excluding multicast and broadcast addresses
+        qint32 ip = 0;
+        ip = (ip << 8) | (qrand() % 29 + 173);  // MSB from 173 to 191
+        ip = (ip << 8) | (qrand() % 255);       // 2nd byte from 0 to 255
+        ip = (ip << 8) | (qrand() % 255);       // 3rd byte from 0 to 255
+        ip = (ip << 8) | (qrand() % 253 + 1);   // LSB from 1 to 254
+        // TODO: Apply more strict boundaries according to
+        // https://en.wikipedia.org/wiki/Reserved_IP_addresses
 
-    const QByteArray &header = QHostAddress(ip).toString().toUtf8();
+        const QByteArray &header = QHostAddress(ip).toString().toUtf8();
 
-    QNetworkRequest req(url);
-    req.setRawHeader("X-FORWARDED-FOR", header);
-    req.setRawHeader("Via", header);
-    req.setRawHeader("CLIENT-IP", header);
+        QNetworkRequest req(url);
+        req.setRawHeader("X-FORWARDED-FOR", header);
+        req.setRawHeader("Via", header);
+        req.setRawHeader("CLIENT-IP", header);
 
-    m_mgr->get(req);
+        m_mgr->get(req);
 
-    ++m_pending;
+        ++m_pending;
+    }
+    catch(...)
+    {
+        emit notifyError("Undefined error occurs",
+                         QString("First time noted in:\n") +
+                         Q_FUNC_INFO);
+        emit end();
+    }
 }
 
 template < typename DataParser >
-void HTTPfetcher < DataParser >::handleComplete()
+void HTTPfetcher < DataParser >::handleComplete() noexcept
 {
     m_noMoreInput = true;
 }
@@ -146,55 +157,72 @@ void HTTPfetcher < DataParser >::handleComplete()
 template < typename DataParser >
 void HTTPfetcher < DataParser >::replyReady(QNetworkReply *reply)
 {
-    // TODO: error check && catch exceptions
-    if (reply->error())
+    try
     {
-        LOG_STREAM << "Erorr occurs for url " << reply->url().toString();
-        LOG_STREAM << reply->errorString();
+        if (reply->error())
+        {
+            reply->deleteLater();
+            throw Exception("Can not get reply for URL\n" +
+                            reply->url().toString() + "\n" +
+                            reply->errorString());
+        }
+
+        QSqlRecord rec;
+
+
+        // TODO: customasible URL
+        QString query; // URL query string
+        QString param("&url=");
+        int idx;
+
+        // Strip out domain from URL.
+        // This is necessary because a data retrieved after fetching
+        // will not contain target domain OR
+        // it will contain normalized or redirected form.
+        // I.e. 'somesite.com' instead of 'www.somesite.com'
+        // Such aliasing will result in duplicated records.
+        // Semantically both are equal, but refers different objects
+        // in database.
+        query = reply->url().query();
+        idx = query.indexOf(param);
+        idx += param.size();
+
+        // TODO: move it to parser
+        rec.append(QSqlField{"name", QVariant::String});
+        rec.append(QSqlField{"rank", QVariant::String});
+        rec.append(QSqlField{"local_rank", QVariant::String});
+        rec.append(QSqlField{"country", QVariant::String});
+
+        m_parser.setDevice(reply);
+        while (!m_parser.atEnd())
+        {
+            m_parser >> rec;
+            rec.setValue("name",  query.mid(idx));
+            emit send(rec);
+        }
+
+        if (!(--m_pending) && m_noMoreInput)
+            emit end();
+
         reply->deleteLater();
-        // TODO: BUG: if error occurs, pending counter will not be decreased
-        // and object will not emit done() signal
-        return;
     }
-
-    QSqlRecord rec;
-
-
-    // TODO: customasible URL
-    QString query; // URL query string
-    QString param("&url=");
-    int idx;
-
-    // Strip out domain from URL.
-    // This is necessary because a data retrieved after fetching
-    // will not contain target domain OR
-    // it will contain normalized or redirected form.
-    // I.e. 'somesite.com' instead of 'www.somesite.com'
-    // Such aliasing will result in duplicated records.
-    // Semantically both are equal, but refers different objects
-    // in database.
-    query = reply->url().query();
-    idx = query.indexOf(param);
-    idx += param.size();
-
-    // TODO: move it to parser
-    rec.append(QSqlField{"name", QVariant::String});
-    rec.append(QSqlField{"rank", QVariant::String});
-    rec.append(QSqlField{"local_rank", QVariant::String});
-    rec.append(QSqlField{"country", QVariant::String});
-
-    m_parser.setDevice(reply);
-    while (!m_parser.atEnd())
+    catch (Exception &e)
     {
-        m_parser >> rec;
-        rec.setValue("name",  query.mid(idx));
-        emit send(rec);
+        LOG_STREAM << e.what();
+        // Do not emit end() signal here. It will allow to process all
+        // pending replies, even if some of them wasn't successed.
+        // Do not emit notifyError(). Exception here is not critical,
+        // so it should be treated as warning, not critical error
+        --m_pending;
+        // TODO: define better exception structure
     }
-
-    if (!(--m_pending) && m_noMoreInput)
+    catch (...)
+    {
+        emit notifyError("Unexpected error occurs",
+                         QString("First time noted in:\n") +
+                         Q_FUNC_INFO);
         emit end();
-
-    reply->deleteLater();
+    }
 }
 
 #endif // HTTP_FETCHER_H

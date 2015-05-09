@@ -29,20 +29,20 @@ protected:
     ///
     /// \brief Handles start signal from superclass.
     ///
-    virtual void handleStart();
+    virtual void handleStart() noexcept;
 
     ///
     /// \brief Processes already existing record.
     /// Doesn't make sence for File Fetcher, so it contains no implementation.
     /// \param[in] rec Existing record.
     ///
-    virtual void handleProcess(QSqlRecord &rec);
+    virtual void handleProcess(QSqlRecord &rec) noexcept;
 
     ///
     /// \brief Provides empty implementation.
     /// See handleProcess()
     ///
-    virtual void handleComplete();
+    virtual void handleComplete() noexcept;
 
 private:
     QFile       m_file;     ///< File to parse
@@ -79,30 +79,46 @@ FileFetcher < DataParser >::~FileFetcher()
 // Protected methods
 
 template < class DataParser >
-void FileFetcher < DataParser >::handleStart()
+void FileFetcher < DataParser >::handleStart() noexcept
 {
-    QSqlRecord rec;
-    rec.append(QSqlField{"name", QVariant::String});
-    rec.append(QSqlField{"email", QVariant::String});
-
-    while (!m_parser.atEnd())
+    try
     {
-        m_parser >> rec;
-        emit send(rec);
-    }
+        QSqlRecord rec;
+        rec.append(QSqlField{"name", QVariant::String});
+        rec.append(QSqlField{"email", QVariant::String});
 
-    emit end();
+        while (!m_parser.atEnd())
+        {
+            m_parser >> rec;
+            emit send(rec);
+        }
+
+        emit end();
+    }
+    catch (Exception &e)
+    {
+        emit notifyError("Failed to parse data from file", e.what());
+        emit end();
+    }
+    catch (...)
+    {
+        // Leave any other error as is
+        emit notifyError("Unexpected error occurs",
+                         QString("First time noted in:\n") +
+                         Q_FUNC_INFO);
+        emit end();
+    }
 }
 
 template < class DataParser >
-void FileFetcher < DataParser >::handleProcess(QSqlRecord &rec)
+void FileFetcher < DataParser >::handleProcess(QSqlRecord &rec) noexcept
 {
     (void) rec;
     // See header for explanation why it is empty
 }
 
 template < class DataParser >
-void FileFetcher < DataParser >::handleComplete()
+void FileFetcher < DataParser >::handleComplete() noexcept
 {
     // See header for explanation why it is empty
 }

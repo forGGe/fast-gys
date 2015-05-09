@@ -37,6 +37,13 @@ signals:
     ///
     void end();
 
+    ///
+    /// \brief notifyError Notifies about error, if any occured.
+    /// \param description
+    /// \param details
+    ///
+    void notifyError(QString description, QString details);
+
 public slots:
     ///
     /// \brief Starts data fetching.
@@ -65,18 +72,18 @@ protected:
     ///
     /// \brief Delegates starting of data fetching to a subclass.
     ///
-    virtual void handleStart() = 0;
+    virtual void handleStart() noexcept = 0;
 
     ///
     /// \brief Delegates processing of existing records to a subclass.
     /// \param[in] rec Exising record.
     ///
-    virtual void handleProcess(QSqlRecord &rec) = 0;
+    virtual void handleProcess(QSqlRecord &rec) noexcept = 0;
 
     ///
     /// \brief Delegates completition to a subclass.
     ///
-    virtual void handleComplete() = 0;
+    virtual void handleComplete() noexcept = 0;
 };
 
 #endif // FETCHER_H
