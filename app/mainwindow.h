@@ -48,7 +48,8 @@ public slots:
     void lauchDone();
     void fileLoadingDone();
     void updateDone();
-    void displayError(QString descr);
+    // empty strings are allowed
+    void displayError(QString descr, QString details);
 };
 
 #endif // MAINWINDOW_H

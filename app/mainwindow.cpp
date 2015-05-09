@@ -63,12 +63,21 @@ void MainWindow::updateDone()
     msg.exec();
 }
 
-void MainWindow::displayError(QString descr)
+void MainWindow::displayError(QString descr, QString details)
 {
-    (void) descr;
+    // TODO: pixmap here?
+    QMessageBox msg;
+    msg.setText("Error occurs.");
+
+    if (!descr.isEmpty())
+        msg.setInformativeText(descr);
+
+    if (!details.isEmpty())
+        msg.setDetailedText(details);
+
+    msg.exec();
 }
 
-// TODO: highest priority
 void MainWindow::on_btnLoadFile_clicked()
 {
     LOG_ENTRY;
