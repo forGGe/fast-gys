@@ -33,6 +33,7 @@ private:
 public slots:
     void newData(const QSqlRecord record);
     void updateData(const QSqlRecord record);
+    void saveCurrentTableAsCSV(QString filePath);
 
 private slots:
     // Not thread safe slot since using references, but faster

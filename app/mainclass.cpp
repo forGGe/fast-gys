@@ -5,6 +5,8 @@
 #include <QAbstractItemView>
 #include <QThread>
 
+#include <QMessageBox>
+
 #include "mainclass.h"
 #include "mainwindow.h"
 #include "exceptions.h"
@@ -223,4 +225,16 @@ void MainClass::updateAll()
     // Now when fetcher knows that last data was provided
     // it will emit end() signal after work will be done
     QMetaObject::invokeMethod(fetcher, "complete");
+}
+
+
+void MainClass::saveCurrentTableAsCSV(QString filePath)
+{
+    QMessageBox msgBox;
+    msgBox.setText(filePath);
+    msgBox.exec();
+    // read entries from DB in loop
+    // Save it as CSV using path
+
+     return;
 }
