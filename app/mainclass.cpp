@@ -228,7 +228,7 @@ void MainClass::updateAll()
 }
 
 
-void MainClass::saveCurrentTableAsCSV(QString filePath)
+void MainClass::saveCurrentTableAsCSV(const QString& filePath)
 {
     QMessageBox msgBox;
     msgBox.setText(filePath);

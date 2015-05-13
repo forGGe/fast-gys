@@ -21,6 +21,7 @@ public:
     MainClass& operator =(const MainClass&) = delete;
 
     void setupView(QAbstractItemView *view);
+    void saveCurrentTableAsCSV(const QString& filePath);
 
 private:
     void setupDatabase();
@@ -33,7 +34,6 @@ private:
 public slots:
     void newData(const QSqlRecord record);
     void updateData(const QSqlRecord record);
-    void saveCurrentTableAsCSV(QString filePath);
 
 private slots:
     // Not thread safe slot since using references, but faster
