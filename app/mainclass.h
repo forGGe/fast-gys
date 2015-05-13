@@ -21,6 +21,7 @@ public:
     MainClass& operator =(const MainClass&) = delete;
 
     void setupView(QAbstractItemView *view);
+    void saveCurrentTableAsCSV(const QString& filePath);
 
 private:
     void setupDatabase();

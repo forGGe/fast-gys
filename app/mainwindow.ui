@@ -96,6 +96,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="btnExportFile">
+        <property name="text">
+         <string>Export into CSV</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="0" column="3">
@@ -136,7 +143,7 @@
      <x>0</x>
      <y>0</y>
      <width>1298</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGrow_Your_Sales">

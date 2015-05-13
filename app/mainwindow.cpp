@@ -118,3 +118,13 @@ void MainWindow::on_pushButton_clicked()
 {
     LOG_ENTRY;
 }
+
+void MainWindow::on_btnExportFile_clicked()
+{
+    LOG_ENTRY;
+    QString filePath = QFileDialog::getSaveFileName(this,
+                                                    "Directory for saving",
+                                                    "./untitled.csv",
+                                                    "Text files (*.csv)");
+    m_main->saveCurrentTableAsCSV(filePath);
+}
