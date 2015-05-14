@@ -9,6 +9,7 @@
 
 #include "fetcher.h"
 #include "exceptions.h"
+#include "types.h"
 
 ///
 /// \brief Simple file fetcher.
@@ -58,12 +59,11 @@ FileFetcher < DataParser >::FileFetcher(const QString &filePath, QObject *parent
     ,m_file(filePath)
     ,m_parser()
 {
+    LOG_ENTRY;
     if (!m_file.open(QIODevice::ReadOnly))
     {
         QString err = QString("Erorr during opening: ") + m_file.errorString();
-
         throw Exception(err);
-        return;
     }
 
     m_parser.setDevice(&m_file);
@@ -72,6 +72,7 @@ FileFetcher < DataParser >::FileFetcher(const QString &filePath, QObject *parent
 template < class DataParser >
 FileFetcher < DataParser >::~FileFetcher()
 {
+    LOG_ENTRY;
     m_file.close();
 }
 

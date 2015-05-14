@@ -40,6 +40,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_btnExit_clicked()
 {
     LOG_ENTRY;
+    QCoreApplication::exit(0);
 }
 
 void MainWindow::lauchDone()

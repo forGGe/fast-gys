@@ -30,7 +30,7 @@ private slots:
     void on_mainSitesTable_cellClicked(int row, int column);
     void on_btnUpdateSelected_clicked();
     void on_checkBox_stateChanged(int arg1);
-    void on_pushButton_clicked();    
+    void on_pushButton_clicked();
     void on_btnExportFile_clicked();
 
 private:

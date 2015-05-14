@@ -125,10 +125,10 @@ void MainClass::newData(const QSqlRecord record)
     // If not - insert new record
     LOG_ENTRY;
     // TODO: do something with these magic strings
-    int search_column = m_model->record().indexOf("name");
+    int searchColumn = m_model->record().indexOf("name");
 
     // Starting search for unique column
-    QModelIndex start = m_model->index(0, search_column);
+    QModelIndex start = m_model->index(0, searchColumn);
     QModelIndexList list = m_model->match(start,
                                           Qt::DisplayRole,
                                           record.value("name"));
@@ -159,59 +159,55 @@ void MainClass::updateData(const QSqlRecord record)
 void MainClass::loadFile(const QString &filePath)
 {
     Fetcher *fetcher = new FileFetcher< TextFileParser > (filePath);
+    QThread *fetcherThread = new QThread;
 
-    QThread *fetcher_thread = new QThread;
-
+    // Data-related connections
     QObject::connect(fetcher, &Fetcher::send,
                      this, &MainClass::newData);
-
-    // Avoiding leaks by using 'deleteLater()' slot
     QObject::connect(fetcher, &Fetcher::end,
                      m_mw, &MainWindow::fileLoadingDone);
+
+    // Make sure fetcher and thread will be destroyed
     QObject::connect(fetcher, &Fetcher::end,
-                     fetcher_thread, &QThread::quit);
-    QObject::connect(fetcher, &Fetcher::end,
+                     fetcherThread, &QThread::quit);
+    QObject::connect(fetcherThread, &QThread::finished,
                      fetcher, &Fetcher::deleteLater);
-    QObject::connect(fetcher, &Fetcher::end,
-                     fetcher_thread, &QThread::deleteLater);
+    QObject::connect(fetcherThread, &QThread::finished,
+                     fetcherThread, &QThread::deleteLater);
 
-    fetcher->moveToThread(fetcher_thread);
-    fetcher_thread->start();
+    // Start fetching when thread starts
+    QObject::connect(fetcherThread, &QThread::started,
+                     fetcher, &Fetcher::start);
 
-    QMetaObject::invokeMethod(fetcher, "start");
+    // TODO: Cover certain conditions (e.g. SIGINT, or exit() was called)
+
+    fetcher->moveToThread(fetcherThread);
+    fetcherThread->start();
 }
 
 void MainClass::updateAll()
 {
-    // TODO: delegate this to the MainClass
-    // Get all data from table
-    // feed fetcher with that data
-    // signal about end
-
-    // EXAMPLE CODE
-    //QSqlRecord rec;
-    //QSqlField name("name", QVariant::String);
-    //rec.append(name);
-    //rec.setValue("name", "ebay.com");
-
     Fetcher *fetcher = new HTTPfetcher< RankXMLParser >;
-    QThread *fetcher_thread = new QThread;
+    QThread *fetcherThread = new QThread;
 
+    // Data-related connections
     QObject::connect(fetcher, &Fetcher::send,
                      this, &MainClass::newData);
     QObject::connect(fetcher, &Fetcher::end,
                      m_mw, &MainWindow::updateDone);
 
-    // Avoiding leaks by using 'deleteLater()' slot
+    // Make sure fetcher will be destroyed if thread finishes
     QObject::connect(fetcher, &Fetcher::end,
-                     fetcher_thread, &QThread::quit);
-    QObject::connect(fetcher, &Fetcher::end,
+                     fetcherThread, &QThread::quit);
+    QObject::connect(fetcherThread, &QThread::finished,
+                     fetcherThread, &QThread::deleteLater);
+    QObject::connect(fetcherThread, &QThread::finished,
                      fetcher, &Fetcher::deleteLater);
-    QObject::connect(fetcher, &Fetcher::end,
-                     fetcher_thread, &QThread::deleteLater);
 
-    fetcher->moveToThread(fetcher_thread);
-    fetcher_thread->start();
+    // TODO: Cover certain conditions (e.g. SIGINT, or exit() was called)
+
+    fetcher->moveToThread(fetcherThread);
+    fetcherThread->start();
 
     for (int i = 0; i < m_model->rowCount(); ++i)
     {

@@ -79,6 +79,7 @@ HTTPfetcher < DataParser >::HTTPfetcher(QObject *parent)
     ,m_pending(0)
     ,m_noMoreInput(false)
 {
+    LOG_ENTRY;
     m_mgr = new QNetworkAccessManager(this);
 
     QObject::connect(m_mgr, &QNetworkAccessManager::finished,
@@ -88,6 +89,7 @@ HTTPfetcher < DataParser >::HTTPfetcher(QObject *parent)
 template < typename DataParser >
 HTTPfetcher < DataParser >::~HTTPfetcher()
 {
+    LOG_ENTRY;
     // m_mgr deletes automatically, as its reference
     // was added to the Qt object tree
 }
@@ -169,7 +171,6 @@ void HTTPfetcher < DataParser >::replyReady(QNetworkReply *reply)
 
         QSqlRecord rec;
 
-
         // TODO: customasible URL
         QString query; // URL query string
         QString param("&url=");
@@ -197,7 +198,7 @@ void HTTPfetcher < DataParser >::replyReady(QNetworkReply *reply)
         while (!m_parser.atEnd())
         {
             m_parser >> rec;
-            rec.setValue("name",  query.mid(idx));
+            rec.setValue("name", query.mid(idx));
             emit send(rec);
         }
 
