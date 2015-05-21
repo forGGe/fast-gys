@@ -5,8 +5,6 @@
 #include <QAbstractItemView>
 #include <QThread>
 
-#include <QMessageBox>
-
 #include "mainclass.h"
 #include "mainwindow.h"
 #include "exceptions.h"
@@ -230,11 +228,26 @@ void MainClass::updateAll()
 
 void MainClass::saveCurrentTableAsCSV(const QString& filePath)
 {
-    QMessageBox msgBox;
-    msgBox.setText(filePath);
-    msgBox.exec();
-    // read entries from DB in loop
-    // Save it as CSV using path
+    QFile fileCSV(filePath);
 
-     return;
+    if(!fileCSV.open(QFile::WriteOnly))
+    {
+        throw Exception("Cannot open file");
+    }
+
+    QSqlRecord rec;
+    QTextStream out(&fileCSV);
+    int columnCount = m_model->columnCount();
+    int rowCount = m_model->rowCount();
+
+    for (int i = 0; i < rowCount; i++)
+    {
+        rec = m_model->record(i);
+        for (int j = 0; j < columnCount; j++)
+        {
+            out << rec.value(j).toString() << ";";
+        }
+        out << "\n";
+    }
+    return;
 }
