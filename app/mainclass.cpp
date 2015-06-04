@@ -4,6 +4,8 @@
 #include <QSqlTableModel>
 #include <QAbstractItemView>
 #include <QThread>
+#include <QApplication>
+#include <QClipboard>
 
 #include "mainclass.h"
 #include "mainwindow.h"
@@ -245,5 +247,26 @@ void MainClass::saveCurrentTableAsCSV(const QString& filePath)
         }
         out << "\n";
     }
+    return;
+}
+
+void MainClass::copyAllTableData()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    QSqlRecord rec;
+    QString text;
+    int columnCount = m_model->columnCount();
+    int rowCount = m_model->rowCount();
+
+    for (int i = 0; i < rowCount; i++)
+    {
+        rec = m_model->record(i);
+        for (int j = 0; j < columnCount; j++)
+        {
+            text += rec.value(j).toString() + "\t";
+        }
+        text += "\n";
+    }
+    clipboard->setText(text);
     return;
 }

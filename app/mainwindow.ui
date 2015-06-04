@@ -103,6 +103,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="btnCopyAll">
+        <property name="text">
+         <string>Copy all</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="0" column="3">
@@ -115,7 +122,7 @@
       </property>
       <property name="sizeHint" stdset="0">
        <size>
-        <width>500</width>
+        <width>400</width>
         <height>20</height>
        </size>
       </property>

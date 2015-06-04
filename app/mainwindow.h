@@ -32,6 +32,7 @@ private slots:
     void on_checkBox_stateChanged(int arg1);
     void on_pushButton_clicked();
     void on_btnExportFile_clicked();
+    void on_btnCopyAll_clicked();
 
 private:
     Ui::MainWindow 	*ui;

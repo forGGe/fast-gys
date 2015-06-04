@@ -129,3 +129,9 @@ void MainWindow::on_btnExportFile_clicked()
                                                     "Text files (*.csv)");
     m_main->saveCurrentTableAsCSV(filePath);
 }
+
+void MainWindow::on_btnCopyAll_clicked()
+{
+    LOG_ENTRY;
+    m_main->copyAllTableData();
+}

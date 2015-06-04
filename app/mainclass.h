@@ -22,6 +22,7 @@ public:
 
     void setupView(QAbstractItemView *view);
     void saveCurrentTableAsCSV(const QString& filePath);
+    void copyAllTableData();
 
 private:
     void setupDatabase();
