@@ -132,6 +132,14 @@ void MainWindow::on_btnExportFile_clicked()
 
 void MainWindow::on_btnCopyAll_clicked()
 {
-    LOG_ENTRY;
-    m_main->copyAllTableData();
+    try
+    {
+        LOG_ENTRY;
+        m_main->copyAllTableData();
+    }
+
+    catch(...)
+    {
+        displayError("Copy to clipboard failed.", "");
+    }
 }
