@@ -129,3 +129,17 @@ void MainWindow::on_btnExportFile_clicked()
                                                     "Text files (*.csv)");
     m_main->saveCurrentTableAsCSV(filePath);
 }
+
+void MainWindow::on_btnCopyAll_clicked()
+{
+    try
+    {
+        LOG_ENTRY;
+        m_main->copyAllTableData();
+    }
+
+    catch(...)
+    {
+        displayError("Copy to clipboard failed.", "");
+    }
+}
