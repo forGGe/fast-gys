@@ -19,6 +19,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+protected:
+    virtual void keyPressEvent(QKeyEvent *event);
+
     // Copying is not permitted.
     MainWindow(const MainWindow&) = delete;
     MainWindow& operator =(MainWindow &) = delete;

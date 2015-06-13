@@ -143,3 +143,32 @@ void MainWindow::on_btnCopyAll_clicked()
         displayError("Copy to clipboard failed.", "");
     }
 }
+
+//the aim of function is to copy selected data to clipboard
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event == QKeySequence::Copy)
+    {
+        LOG_STREAM << "Copy event occurs";
+
+        QString text;
+        QClipboard *clipboard = QApplication::clipboard();
+        int columnsCount = ui->tableView->model()->columnCount();
+
+        //copy process is based on the ability to select only an entire row
+        //SelectionBehavior = SelectRows
+        QModelIndexList selectedRows = ui->tableView->selectionModel()->selectedRows();
+
+        for (auto row : selectedRows)
+        {
+            for(int i = 0; i < columnsCount; i++)
+            {
+                QModelIndex cell = ui->tableView->selectionModel()->model()->index(row.row(),i);
+                text += cell.data().toString() + "\t";
+            }
+            text += "\n";
+        }
+        clipboard->setText(text);
+    }
+}
+
