@@ -14,9 +14,11 @@ TextFileParser::TextFileParser()
 }
 
 TextFileParser::TextFileParser(QIODevice *device)
-    :m_nameRegx("(([\\w-]+)\\.)+[a-zA-Z]{2,3}")
+    :m_nameRegx("\\s(([\\w-]+)\\.)+[a-zA-Z]{2,3}\\s")
     ,m_emailRegx("[a-zA-Z0-9\\._%+-]+@[a-zA-Z0-9\\.-]+\\.[a-zA-Z]{2,6}")
     ,m_in(device)
+    ,m_current()
+    ,m_it()
 {
     LOG_ENTRY;
 }
@@ -39,6 +41,40 @@ TextFileParser& TextFileParser::operator >>(QSqlRecord &rval)
     if (m_in.atEnd())
         throw Exception("Called in the end of the stream!");
 
+#if 0
+    // Populate string
+    while (!m_in.atEnd()) {
+        if (!m_it.hasNext()) {
+            m_current = m_in.readLine();
+            m_current.remove(QChar('\000'));
+
+            if (m_current.isEmpty()) {
+                continue;
+            }
+
+            m_it = m_nameRegx.globalMatch(m_current);
+        }
+
+        if (m_it.hasNext()) {
+            QRegularExpressionMatch nameMatch = m_it.next();
+            if (nameMatch.hasMatch())
+            {
+                rval.clearValues();
+                QRegularExpressionMatch emailMatch = m_emailRegx.match(m_current);
+
+                if (emailMatch.hasMatch())
+                    rval.setValue("email", emailMatch.captured().toLower());
+
+                // Note that whitespace at start must be removed
+                rval.setValue("name", nameMatch.captured().toLower().trimmed());
+
+                break;
+            }
+        }
+    }
+
+
+#else
     while (!m_in.atEnd())
     {
         QString line = m_in.readLine();
@@ -46,22 +82,26 @@ TextFileParser& TextFileParser::operator >>(QSqlRecord &rval)
 
         if (!line.isEmpty())
         {
-            QRegularExpressionMatch nameMatch = m_nameRegx.match(line);
+
+            auto nameMatch = m_nameRegx.match(line);
+
 
             // Do not include records without domain names
             if (nameMatch.hasMatch())
             {
                 rval.clearValues();
-                QRegularExpressionMatch emailMatch = m_emailRegx.match(line);
+                auto emailMatch = m_emailRegx.match(line);
 
                 if (emailMatch.hasMatch())
                     rval.setValue("email", emailMatch.captured().toLower());
 
-                rval.setValue("name", nameMatch.captured().toLower());
+                // Note that whitespace at start and the end must be removed
+                rval.setValue("name", nameMatch.captured().toLower().trimmed());
                 break;
             }
         }
     }
+#endif
     return *this;
 }
 

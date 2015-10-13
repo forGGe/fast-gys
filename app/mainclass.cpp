@@ -20,6 +20,7 @@ MainClass::MainClass(MainWindow *parent)
     ,m_db(QSqlDatabase::addDatabase("QSQLITE"))
     ,m_model(nullptr)
     ,m_mw(parent)
+    ,m_hackCounter(0)
 {
     LOG_ENTRY;
 
@@ -127,27 +128,49 @@ void MainClass::newData(const QSqlRecord record)
     // If not - insert new record
     LOG_ENTRY;
     // TODO: do something with these magic strings
-    int searchColumn = m_model->record().indexOf("name");
 
-    // Starting search for unique column
-    QModelIndex start = m_model->index(0, searchColumn);
-    QModelIndexList list = m_model->match(start,
-                                          Qt::DisplayRole,
-                                          record.value("name"));
+    if (!m_model->insertRecord(-1, record))
+    {
+        LOG_STREAM << "Failed to insert record: " << record.value("name");
 
-    // No items found - means data might be new
-    if (list.isEmpty()) {
-        if (m_model->insertRecord(-1, record) == false) {
-            LOG_STREAM << "Failed to insert record";
+        LOG_STREAM << m_model->lastError().text();
+
+        int searchColumn = m_model->record().indexOf("name");
+
+        // Starting search for unique column
+        QModelIndex start = m_model->index(0, searchColumn);
+        QModelIndexList list = m_model->match(start,
+                                              Qt::DisplayRole,
+                                              record.value("name"));
+
+        // No items found - means data might be new
+        if (list.isEmpty())
+        {
+            LOG_STREAM << ">>>>>>>>>>>> NOT FOUND";
+            return;
+
         }
-        return;
+
+        // TODO: avoid using ugly indexing
+        if (m_model->setRecord(list.at(0).row(), record) == false)
+        {
+            LOG_STREAM << "*************** Failed to set record";
+            return;
+        }
     }
 
-    // TODO: avoid using ugly indexing
-    if (m_model->setRecord(list.at(0).row(), record) == false) {
-        LOG_STREAM << "Failed to set record";
-        return;
+    // Flush every 'n' entries
+    if (!(m_hackCounter++ % 512))
+    {
+        LOG_STREAM << "Restaring transaction...";
+        this->flushDB();
+        // Start another transaction
+        if (!m_db.transaction())
+        {
+            LOG_STREAM << "Transacion start fails!!!";
+        }
     }
+
 }
 
 void MainClass::updateData(const QSqlRecord record)
@@ -155,6 +178,18 @@ void MainClass::updateData(const QSqlRecord record)
     LOG_ENTRY;
     if (m_model->setRecord(0, record) == false) {
         LOG_STREAM << "Failed to set record";
+    }
+
+    // Flush every 'n' entries
+    if (!(m_hackCounter++ % 512))
+    {
+        LOG_STREAM << "Restaring transaction...";
+        this->flushDB();
+        // Start another transaction
+        if (!m_db.transaction())
+        {
+            LOG_STREAM << "Transacion start fails!!!";
+        }
     }
 }
 
@@ -166,6 +201,8 @@ void MainClass::loadFile(const QString &filePath)
     // Data-related connections
     QObject::connect(fetcher, &Fetcher::send,
                      this, &MainClass::newData);
+    QObject::connect(fetcher, &Fetcher::end,
+                     this, &MainClass::flushDB);
     QObject::connect(fetcher, &Fetcher::end,
                      m_mw, &MainWindow::fileLoadingDone);
 
@@ -183,6 +220,12 @@ void MainClass::loadFile(const QString &filePath)
 
     // TODO: Cover certain conditions (e.g. SIGINT, or exit() was called)
 
+    // Begin a transaction
+    if (!m_db.transaction())
+    {
+        LOG_STREAM << "Transacion start fails!!!";
+    }
+
     fetcher->moveToThread(fetcherThread);
     fetcherThread->start();
 }
@@ -195,6 +238,8 @@ void MainClass::updateAll()
     // Data-related connections
     QObject::connect(fetcher, &Fetcher::send,
                      this, &MainClass::newData);
+    QObject::connect(fetcher, &Fetcher::end,
+                     this, &MainClass::flushDB);
     QObject::connect(fetcher, &Fetcher::end,
                      m_mw, &MainWindow::updateDone);
 
@@ -209,6 +254,13 @@ void MainClass::updateAll()
     // TODO: Cover certain conditions (e.g. SIGINT, or exit() was called)
 
     fetcher->moveToThread(fetcherThread);
+
+    // Begin a transaction
+    if (!m_db.transaction())
+    {
+        LOG_STREAM << "Transacion start fails!!!";
+    }
+
     fetcherThread->start();
 
     for (int i = 0; i < m_model->rowCount(); ++i)
@@ -221,6 +273,15 @@ void MainClass::updateAll()
     // Now when fetcher knows that last data was provided
     // it will emit end() signal after work will be done
     QMetaObject::invokeMethod(fetcher, "complete");
+}
+
+void MainClass::flushDB()
+{
+    m_model->submitAll();
+    if (!m_db.commit())
+    {
+        LOG_STREAM << "Commit database failed!";
+    }
 }
 
 

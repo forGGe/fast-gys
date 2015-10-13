@@ -61,7 +61,9 @@ private:
     const QRegularExpression m_emailRegx;
     /// }@
 
-    QTextStream m_in; ///< Stream for reading
+    QTextStream m_in;       ///< Stream for reading
+    QString     m_current;  ///< Current preprocessed string
+    QRegularExpressionMatchIterator m_it;
 };
 
 

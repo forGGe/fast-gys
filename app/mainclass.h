@@ -31,6 +31,8 @@ private:
     QSqlDatabase     m_db;
     QSqlTableModel   *m_model;
     MainWindow       *m_mw;
+    // Counter used to flush DB periodically. Hack.
+    uint64_t          m_hackCounter;
 
 public slots:
     void newData(const QSqlRecord record);
@@ -40,6 +42,7 @@ private slots:
     // Not thread safe slot since using references, but faster
     void loadFile(const QString &filePath);
     void updateAll();
+    void flushDB();
 };
 
 
